@@ -1,5 +1,5 @@
 import { Transaction, SystemProgram, Connection, Keypair, LAMPORTS_PER_SOL, sendAndConfirmTransaction, PublicKey } from "@solana/web3.js"
-import wallet from "../dev-wallet.json"
+// import wallet from "../dev-wallet.json"
 
 // Import our dev wallet keypair from the wallet file
 const from = Keypair.fromSecretKey(new Uint8Array(wallet));

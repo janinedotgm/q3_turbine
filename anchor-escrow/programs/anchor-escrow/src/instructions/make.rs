@@ -3,6 +3,10 @@ use anchor_spl::{associated_token::AssociatedToken, token_interface::{ Mint, Tok
 
 use crate::Escrow;
 
+
+/**
+ * Define the Make instruction
+ */
 #[derive(Accounts)]
 #[instruction(seed: u64)] // exposes instruction variables to the accounts
 pub struct Make<'info> {

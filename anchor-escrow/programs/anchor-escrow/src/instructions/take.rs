@@ -4,7 +4,9 @@ use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface,TransferChe
 
 use crate::Escrow;
 
-
+/**
+ * Define the Take instruction
+ */
 #[derive(Accounts)]
 pub struct Take<'info> {
     #[account(mut)]
@@ -66,9 +68,7 @@ impl<'info> Take<'info> {
 
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-        transfer_checked(cpi_ctx, self.escrow.receive, self.mint_b.decimals)?;
-
-        Ok(())
+        transfer_checked(cpi_ctx, self.escrow.receive, self.mint_b.decimals)
     }
 
     pub fn withdraw_and_close_vault(&mut self) -> Result<()> {

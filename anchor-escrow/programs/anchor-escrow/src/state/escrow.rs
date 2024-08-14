@@ -1,5 +1,13 @@
 use anchor_lang::prelude::*;
 
+/**
+ * Define the Escrow account
+ * 
+ * It facilitates the exchange of two different types of tokesn. 
+ * One party deposits a certain amount of one token type (mint A), 
+ * and the other party deposits a certain amount of the other token type (mint B).
+ * The escrow account is responsible for holding the tokens until the exchange is finalized.
+ */
 #[account]
 #[derive(InitSpace)]
 pub struct Escrow {

@@ -106,7 +106,7 @@ mod tests {
 
         // Define ix data
         let args = CompleteArgs{
-            github: b"janinedotgm".to_vec()
+            github: b"<YOUR GITHUB ACCOUNT>".to_vec()
         };
 
         // Get recent blockhash

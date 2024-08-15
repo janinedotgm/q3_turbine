@@ -1,23 +1,32 @@
-# WBA Solana Starter TS
+## Setup
 
-## Overview
+Before you start, ensure you have a `wba-wallet.json` file in the `wallet` directory.
 
-This project is a collection of tools and scripts for interacting with the Solana blockchain. It includes functionalities for generating wallets, airdropping SOL, transferring SOL, and interacting with various Solana programs.
+## Running the Scripts
 
-## Prerequisites
+1. Install the project dependencies:
+    ```sh
+    yarn
+    ```
 
-- Node.js
-- Yarn
-- Solana CLI
+2. Execute the scripts using:
+    ```sh
+    yarn <script-name>
+    ```
 
-## How to
+### Available Scripts
 
-Install dependencies:
-```sh
-yarn
-```
-
-Execute a script:
-```sh
-yarn <script>
-```
+- **Progress:**
+  [x] `spl_init`
+  [x] `spl_mint`
+  [x] `spl_transfer`
+  [x] `spl_metadata`
+  [x] `nft_image`
+  [x] `nft_metadata`
+  [x] `nft_mint`
+  [ ] `vault_close`
+  [ ] `vault_deposit_nft`
+  [ ] `vault_deposit_spl`
+  [ ] `vault_withdraw_nft`
+  [ ] `vault_withdraw_spl`
+  [ ] `vault_withdraw`

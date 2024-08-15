@@ -13,7 +13,7 @@ import {
   BN,
 } from "@coral-xyz/anchor";
 import { WbaVault, IDL } from "../programs/wba_vault";
-import wallet from "../wba-wallet.json";
+import wallet from "./wallet/wba-wallet.json"
 import {
   TOKEN_PROGRAM_ID,
   getOrCreateAssociatedTokenAccount,

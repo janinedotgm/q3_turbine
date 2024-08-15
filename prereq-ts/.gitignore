@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+
+# TypeScript build outputs
+dist/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Ignore wallets
+wallets/*

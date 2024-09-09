@@ -5,13 +5,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-nft_staking = "BpyuS5t96NAYgXz4HBCXDhmuqLQ3YX58eMBp7Qr9dYcx"
+refund = "GuSMF3URMDTyW2cqUpmq4U1ZjxNcoc9VwLzcfEJf5kpC"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "http://127.0.0.1:8899"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

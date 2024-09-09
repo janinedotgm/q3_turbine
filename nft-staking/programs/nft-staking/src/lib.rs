@@ -1,5 +1,3 @@
-use anchor_lang::prelude::*;
-
 declare_id!("BpyuS5t96NAYgXz4HBCXDhmuqLQ3YX58eMBp7Qr9dYcx");
 
 mod state;

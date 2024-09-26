@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
-
+/**
+ * Escrow that holds the game funds
+ */
 // TODO: Each player should be a seperate PDA
 #[account]
 pub struct Escrow {
@@ -15,16 +17,20 @@ pub struct Escrow {
 
 impl Space for Escrow {
     const INIT_SPACE: usize = 
+    8 + // discriminator
         8 + // seed
         8 + // player_count
         8 + // duration
         GameStatus::INIT_SPACE + // status
         8 + // created_at
         8 + // deposit
-        8 +
+        8 + // deposit_per_player
         8; // bump
 }
 
+/**
+ * GameStatus to indicate the status of the game
+ */
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, PartialEq)]
 pub enum GameStatus {
     OPEN, // Game is open but has not started
@@ -37,6 +43,9 @@ impl Space for GameStatus {
     const INIT_SPACE: usize = 1;
 }
 
+/**
+ * Player to hold the player data
+ */
 #[account]
 pub struct Player {
     pub score: u64,
@@ -55,5 +64,5 @@ impl Default for Player {
 }
 
 impl Space for Player {
-    const INIT_SPACE: usize = 8 + 8 + 8;
+    const INIT_SPACE: usize = 8 + 8 + 8 + 8;
 }

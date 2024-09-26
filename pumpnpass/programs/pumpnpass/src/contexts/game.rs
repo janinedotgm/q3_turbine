@@ -1,8 +1,6 @@
 use anchor_lang::{prelude::*, system_program::{ Transfer, transfer }};
 
-use crate::errors::ErrorCode;
 use crate::Escrow;
-use crate::Player;
 use crate::GameStatus;
 
 #[derive(Accounts)]
@@ -25,42 +23,6 @@ pub struct Game<'info> {
         bump
     )]
     pub escrow: Account<'info, Escrow>,
-
-    #[account(
-        init,
-        payer = payer,
-        space = Player::INIT_SPACE,
-        seeds = [b"player1", escrow.key().as_ref()],
-        bump
-    )]
-    pub player1_account: Account<'info, Player>,
-
-    #[account(
-        init,
-        payer = payer,
-        space = Player::INIT_SPACE,
-        seeds = [b"player2", escrow.key().as_ref()],
-        bump
-    )]
-    pub player2_account: Account<'info, Player>,
-
-    // #[account(
-    //     init,
-    //     payer = payer,
-    //     space = Player::INIT_SPACE,
-    //     seeds = [b"player3", escrow.key().as_ref()],
-    //     bump
-    // )]
-    // pub player3_account: Account<'info, Player>,
-
-    // #[account(
-    //     init,
-    //     payer = payer,
-    //     space = Player::INIT_SPACE,
-    //     seeds = [b"player4", escrow.key().as_ref()],
-    //     bump
-    // )]
-    // pub player4_account: Account<'info, Player>,
 
     pub system_program: Program<'info, System>,
 }
@@ -94,37 +56,38 @@ impl<'info> Game<'info> {
             deposit_per_player: 0,
             bump: bumps.escrow,
         });
-        Ok(())
-    }
-
-    pub fn deposit(&mut self, amount: u64, player_number: u64) -> Result<()> {
-
-        // Get the player account based on the player number
-        let player_account = match player_number {
-            1 => &self.player1_account,
-            2 => &self.player2_account,
-            // 3 => &self.player3_account,
-            // 4 => &self.player4_account,
-            _ => return Err(ErrorCode::InvalidPlayerNumber.into()),
-        };
-
-        // Transfer the amount from the player account to the escrow account
-        let cpi_accounts = Transfer {
-            from: player_account.to_account_info(),
-            to: self.escrow.to_account_info(),
-        };
-
-        let cpi_program = self.system_program.to_account_info();
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-        transfer(cpi_ctx, amount)?;
-
-        // Update the escrow deposit;
-        self.escrow.deposit += amount;
-
-        self.escrow.player_count += 1;
 
         Ok(())
     }
+
+    // pub fn deposit(&mut self, amount: u64, player_number: u64) -> Result<()> {
+
+    //     // Get the player account based on the player number
+    //     let player_account = match player_number {
+    //         1 => &self.player1_account,
+    //         2 => &self.player2_account,
+    //         // 3 => &self.player3_account,
+    //         // 4 => &self.player4_account,
+    //         _ => return Err(ErrorCode::InvalidPlayerNumber.into()),
+    //     };
+
+    //     // Transfer the amount from the player account to the escrow account
+    //     let cpi_accounts = Transfer {
+    //         from: player_account.to_account_info(),
+    //         to: self.escrow.to_account_info(),
+    //     };
+
+    //     let cpi_program = self.system_program.to_account_info();
+    //     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+    //     transfer(cpi_ctx, amount)?;
+
+    //     // Update the escrow deposit;
+    //     self.escrow.deposit += amount;
+
+    //     self.escrow.player_count += 1;
+
+    //     Ok(())
+    // }
 
 
 }

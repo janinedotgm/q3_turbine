@@ -25,5 +25,18 @@ pub mod pumpnpass {
 
        Ok(())
     }
+
+    /// UPDATE GAME STATUS!!!!!!!!!!!!!!!!!!!!!!!!!
+    /// 
+    
+    pub fn deposit(ctx: Context<Deposit>, seed: u64, amount: u64) -> Result<()> {
+        ctx.accounts.deposit(amount)?;
+        Ok(())
+    }
+
+    // pub fn deposit(ctx: Context<Game>, amount: u64, player_number: u64) -> Result<()> {
+    //     ctx.accounts.deposit(amount, player_number)?;
+    //     Ok(())
+    // }
 }
 

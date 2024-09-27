@@ -12,9 +12,8 @@ pub struct Deposit<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
 
-    /// CHECK: This account is safe because it is only used for its public key and does not need to authorize any transactions.
     #[account(mut)]
-    pub payer: AccountInfo<'info>,
+    pub payer: SystemAccount<'info>,
 
     #[account(
         mut,
@@ -42,27 +41,34 @@ pub struct Deposit<'info> {
 
 impl<'info> Deposit<'info> {
 
+    /**
+     * Deposit game bet to escrow
+     * 
+     * @param amount - Amount of SOL in lamports to deposit
+     */
     pub fn deposit(&mut self, amount: u64) -> Result<()> {
         let escrow = &mut self.escrow;
         let player_account = &mut self.player_account;
 
         require!(escrow.status == GameStatus::Pending, ErrorCode::GameNotStarted);
 
+        // Deposit game bet to escrow
         let cpi_accounts = Transfer {
-            from: self.player.to_account_info(), // Use the player's account to transfer SOL
+            from: self.player.to_account_info(),
             to: escrow.to_account_info()
         };
         
-
         let cpi_program = self.system_program.to_account_info();
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
         transfer(cpi_ctx, amount)?;
 
+        // Update escrow and player account balances
         escrow.deposit += amount;
         player_account.deposit += amount;
         let expected_deposit = escrow.deposit_per_player * escrow.player_count;
         let new_deposit = escrow.deposit;
 
+        // If the deposit is equal to the expected deposit, set the game status to active
         if new_deposit == expected_deposit {
             escrow.status = GameStatus::Active;
         }
@@ -70,20 +76,34 @@ impl<'info> Deposit<'info> {
         Ok(())
     }
 
+    /**
+     * Save player score
+     * 
+     * @param score - Player score (the number of points they scored)
+     */
     pub fn save_score(&mut self, score: u64) -> Result<()> {
         let player_account = &mut self.player_account;
         player_account.score = score;
         Ok(())
     }
 
+    /**
+     * Save player payout
+     * 
+     * @param amount - Amount of SOL in lamports to payout
+     */
     pub fn save_payout(&mut self, amount: u64) -> Result<()> { 
         let escrow = &mut self.escrow;
-        escrow.status = GameStatus::Finalizing;
+        escrow.status = GameStatus::Finalizing; // Payouts should only be made when the game is finished TODO: Make this more robust
 
+        // Save payout to player account
         let player_account = &mut self.player_account;
         player_account.payout += amount;
 
+        // Update escrow player count
         escrow.player_count -= 1;
+
+        // If the escrow has no more players, set the game status to finished
         if escrow.player_count == 0 {
             escrow.status = GameStatus::Finished;
         }

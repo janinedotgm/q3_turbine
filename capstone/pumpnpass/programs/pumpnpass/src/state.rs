@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 /**
  * Escrow that holds the game funds
  */
-// TODO: Each player should be a seperate PDA
 #[account]
 pub struct Escrow {
     pub seed: u64,

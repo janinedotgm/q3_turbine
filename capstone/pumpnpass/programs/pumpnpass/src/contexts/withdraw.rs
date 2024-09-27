@@ -38,7 +38,13 @@ pub struct Withdraw<'info> {
 }
 
 impl<'info> Withdraw<'info> {
+
+    /**
+     * Withdraw payout from escrow to player
+     */
     pub fn withdraw(&mut self) -> Result<()> {
+
+        // Signer seeds for the escrow account
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
             self.payer.to_account_info().key.as_ref(),
@@ -46,6 +52,7 @@ impl<'info> Withdraw<'info> {
             &[self.escrow.bump],
         ]];
     
+        // Transfer payout to player    
         let cpi_accounts = Transfer {
             from: self.payer.to_account_info(), // Use the payer's account to transfer SOL
             to: self.player.to_account_info(),
@@ -55,14 +62,17 @@ impl<'info> Withdraw<'info> {
     
         transfer(cpi_ctx, self.player_account.payout)?;
     
+        // Update escrow balance
+        self.escrow.deposit -= self.player_account.payout;
 
-        // escrow.deposit -= player_account.payout;
-        // player_account.payout = 0;
-        // player_account.score = 0;
+        // Reset player account
+        self.player_account.payout = 0;
+        self.player_account.score = 0;
 
-        // if escrow.deposit == 0 {
-        //     escrow.status = GameStatus::ReadyToClose;
-        // }
+        // If the escrow is empty, set the game status to ready to close
+        if self.escrow.deposit == 0 {
+            self.escrow.status = GameStatus::ReadyToClose;
+        }
 
         Ok(())
     }

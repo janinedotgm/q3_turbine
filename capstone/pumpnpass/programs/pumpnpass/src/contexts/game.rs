@@ -30,6 +30,13 @@ pub struct Game<'info> {
 
 impl<'info> Game<'info> {
 
+    /**
+     * Initialize escrow
+     * 
+     * @param duration - Duration of the game in seconds
+     * @param seed - Seed for the game (uuid from db)
+     * @param deposit_per_player - Amount of SOL in lamports to deposit per player
+     */
     pub fn init_escrow(
         &mut self, 
         duration: u64, 

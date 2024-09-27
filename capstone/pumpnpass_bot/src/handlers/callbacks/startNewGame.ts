@@ -3,6 +3,7 @@ import { sendMessage } from "../../utils/telegramApi";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getBalance } from "@/src/services/wallet";
 import { createMainMenuKeyboard } from "@/src/utils/keyboards";
+import { findOpenGame, joinGame, createGame } from "@/src/db/queries/game";
 
 export async function handleStartNewGame(chatId: string, telegramId: string) {
   const existingUser = await findUserByTelegramId(telegramId);
@@ -24,6 +25,28 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
       createMainMenuKeyboard()
     );
     return;
+  } else {
+    const openGame = await findOpenGame();
+
+    if(openGame) {
+      if(openGame.players !== null){
+        openGame.players.push(existingUser.id);
+        await joinGame(openGame.id, openGame.players);
+        await sendMessage(
+          chatId,
+          "You have joined the game. It will start in a few seconds.",
+        );
+        return;
+      }
+    } else {
+      const newGame = await createGame([existingUser.id]);
+
+      await sendMessage(
+        chatId,
+        "Waiting for other players to join...",
+      );
+      return;
+    }
   }
   
   

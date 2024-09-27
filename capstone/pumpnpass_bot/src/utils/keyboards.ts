@@ -6,10 +6,12 @@ import { CALLBACK_DATA } from "../constants";
 export const createMainMenuKeyboard = () => ({
   inline_keyboard: [
     [
-      { text: "Start New Game", callback_data: CALLBACK_DATA.START_NEW_GAME },
-      { text: "Check Balance", callback_data: CALLBACK_DATA.CHECK_BALANCE },
+      { text: "Play Game", callback_data: CALLBACK_DATA.START_NEW_GAME },
     ],
-    [{ text: "Get Wallet Key", callback_data: CALLBACK_DATA.GET_WALLET_KEY }],
+    [
+      { text: "Get Wallet Key", callback_data: CALLBACK_DATA.GET_WALLET_KEY },
+      { text: "Check Balance", callback_data: CALLBACK_DATA.CHECK_BALANCE }
+    ],
   ],
 });
 
@@ -19,6 +21,7 @@ export const createGameActionKeyboard = () => ({
     [
       { text: "Pump", callback_data: CALLBACK_DATA.GAME_PUMP },
       { text: "Pass", callback_data: CALLBACK_DATA.GAME_PASS },
+      
     ],
   ],
 });

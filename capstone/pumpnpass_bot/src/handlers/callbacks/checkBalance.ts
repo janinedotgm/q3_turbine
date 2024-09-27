@@ -1,14 +1,12 @@
 // src/handlers/callbacks/checkBalance.ts
 
 import { sendMessage } from "../../utils/telegramApi";
-import { dbClient } from "@/src/services/db";
+import { db } from "@/src/db";
 import { getBalance } from "@/src/services/wallet";
 import { createMainMenuKeyboard } from "@/src/utils/keyboards";
-
+import { findUserByTelegramId } from "@/src/db/queries/users";
 export async function handleCheckBalance(chatId: string, telegramId: string) {
-  const existingUser = await dbClient.user.findUnique({
-    where: { telegramId },
-  });
+  const existingUser = await findUserByTelegramId(telegramId);
 
   if (!existingUser) {
     await sendMessage(

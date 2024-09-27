@@ -46,7 +46,7 @@ impl<'info> Deposit<'info> {
         let escrow = &mut self.escrow;
         let player_account = &mut self.player_account;
 
-        require!(escrow.status == GameStatus::PENDING, ErrorCode::GameNotStarted);
+        require!(escrow.status == GameStatus::Pending, ErrorCode::GameNotStarted);
 
         let cpi_accounts = Transfer {
             from: self.player.to_account_info(), // Use the player's account to transfer SOL
@@ -64,7 +64,7 @@ impl<'info> Deposit<'info> {
         let new_deposit = escrow.deposit;
 
         if new_deposit == expected_deposit {
-            escrow.status = GameStatus::ACTIVE;
+            escrow.status = GameStatus::Active;
         }
         
         Ok(())
@@ -73,6 +73,21 @@ impl<'info> Deposit<'info> {
     pub fn save_score(&mut self, score: u64) -> Result<()> {
         let player_account = &mut self.player_account;
         player_account.score = score;
+        Ok(())
+    }
+
+    pub fn save_payout(&mut self, amount: u64) -> Result<()> { 
+        let escrow = &mut self.escrow;
+        escrow.status = GameStatus::Finalizing;
+
+        let player_account = &mut self.player_account;
+        player_account.payout += amount;
+
+        escrow.player_count -= 1;
+        if escrow.player_count == 0 {
+            escrow.status = GameStatus::Finished;
+        }
+
         Ok(())
     }
 

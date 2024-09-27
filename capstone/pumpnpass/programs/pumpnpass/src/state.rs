@@ -33,10 +33,12 @@ impl Space for Escrow {
  */
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, PartialEq)]
 pub enum GameStatus {
-    OPEN, // Game is open but has not started
-    ACTIVE, // Game is active
-    PENDING, // Waiting for player deposits
-    FINISHED, // Payouts are done, escrow can be closed
+    Open, // Game is open but has not started
+    Active, // Game is active
+    Pending, // Waiting for player deposits
+    Finalizing, // Calculating payouts
+    Finished, // Calculations are done, waiting for fund distribution
+    ReadyToClose, // All payouts are done, escrow can be closed
 }
 
 impl Space for GameStatus {

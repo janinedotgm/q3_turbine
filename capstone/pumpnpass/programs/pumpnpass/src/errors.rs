@@ -5,4 +5,6 @@ pub enum ErrorCode {
     InvalidPlayerNumber,
     GameNotOpen,
     GameNotStarted,
+    GameNotFinished,
+    GameNotFinalizing,
 }

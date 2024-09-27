@@ -43,7 +43,7 @@ impl<'info> Game<'info> {
         self.escrow.set_inner(Escrow {
             seed,
             player_count: 2,
-            status: GameStatus::PENDING,
+            status: GameStatus::Pending,
             duration,
             created_at: timestamp,
             deposit: 0,

@@ -2,8 +2,7 @@
 
 import { sendMessage, answerCallbackQuery } from "../utils/telegramApi";
 import { CALLBACK_DATA } from "../constants";
-import { handleCheckBalance } from "./callbacks/checkBalance";
-import { handleGetWalletKey } from "./callbacks/getWalletKey";
+import { handleCheckBalance, handleGetWalletKey, handleStartNewGame } from "./callbacks";
 
 export async function handleCallbackQuery(callbackQuery: any) {
   const data = callbackQuery.data;
@@ -16,6 +15,9 @@ export async function handleCallbackQuery(callbackQuery: any) {
       break;
     case CALLBACK_DATA.GET_WALLET_KEY:
       await handleGetWalletKey(chatId, telegramId);
+      break;
+    case CALLBACK_DATA.START_NEW_GAME:
+      await handleStartNewGame(chatId, telegramId);
       break;
     default:
       await sendMessage(chatId, "Unknown action.");

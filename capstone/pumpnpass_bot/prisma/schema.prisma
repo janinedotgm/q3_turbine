@@ -1,19 +1,84 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 model User {
-  telegramId   String        @unique
+  telegramId   String        @id @unique
   publicKey    String
   username     String?
   authTag      Bytes
   iv           Bytes
   secretKey    Bytes
   createdAt    DateTime      @default(now())
+  playerGames  PlayerGame[]
+  playerRounds PlayerRound[]
+}
+
+model Game {
+  id            String        @id @default(uuid())
+  status        GameStatus
+  rounds        Int
+  currentRound  Int
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  roundsList    Round[]
+  playerGames   PlayerGame[]
+  playerRounds  PlayerRound[]
+}
+
+model Round {
+  id            String          @id @default(uuid())
+  gameId        String
+  game          Game            @relation(fields: [gameId], references: [id])
+  startingValue Int
+  currentValue  Int
+  status        RoundStatus
+  loserId       String
+  number        Int
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  playerRounds  PlayerRound[]
+}
+
+model PlayerGame {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [telegramId])
+  gameId        String
+  game          Game      @relation(fields: [gameId], references: [id])
+  totalPoints   Int
+  status        PlayerGameStatus
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model PlayerRound {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [telegramId])
+  gameId        String
+  game          Game      @relation(fields: [gameId], references: [id])
+  roundId       String
+  round         Round     @relation(fields: [roundId], references: [id])
+  points        Int
+  pumps         Int
+  turns         Int
+  isActive      Boolean
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum GameStatus {
+  OPEN
+  PENDING
+  ACTIVE
+  FINALIZING
+  FINISHED
+}
+
+enum RoundStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum PlayerGameStatus {
+  OPEN
+  ACTIVE
+  FINISHED
 }

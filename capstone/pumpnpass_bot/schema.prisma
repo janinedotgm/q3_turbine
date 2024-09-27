@@ -1,0 +1,35 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  telegramId String   @unique
+  publicKey  String
+  username   String?
+  authTag    Bytes
+  iv         Bytes
+  secretKey  Bytes
+  createdAt  DateTime @default(now())
+}
+
+model Round {
+  id            String      @id @default(uuid())
+  gameId        String
+  startingValue Int
+  currentValue  Int
+  status        RoundStatus
+  loserId       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum RoundStatus {
+  Active
+  Completed
+}

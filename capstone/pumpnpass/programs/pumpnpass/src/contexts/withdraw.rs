@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use anchor_lang::system_program::{Transfer, transfer};
 
 use crate::{ Player, Escrow, GameStatus };
-use crate::errors::ErrorCode;
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {

@@ -1,4 +1,4 @@
-use anchor_lang::{prelude::*, system_program::{ Transfer, transfer }};
+use anchor_lang::prelude::*;
 
 use crate::Escrow;
 use crate::GameStatus;

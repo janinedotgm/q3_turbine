@@ -60,8 +60,20 @@ impl<'info> Deposit<'info> {
 
         escrow.deposit += amount;
         player_account.deposit += amount;
-        escrow.player_count += 1;
+        let expected_deposit = escrow.deposit_per_player * escrow.player_count;
+        let new_deposit = escrow.deposit;
+
+        if new_deposit == expected_deposit {
+            escrow.status = GameStatus::ACTIVE;
+        }
         
         Ok(())
     }
+
+    pub fn save_score(&mut self, score: u64) -> Result<()> {
+        let player_account = &mut self.player_account;
+        player_account.score = score;
+        Ok(())
+    }
+
 }

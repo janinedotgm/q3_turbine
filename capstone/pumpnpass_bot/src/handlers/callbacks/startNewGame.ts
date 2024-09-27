@@ -4,6 +4,7 @@ import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getBalance } from "@/src/services/wallet";
 import { createMainMenuKeyboard } from "@/src/utils/keyboards";
 import { findOpenGame, joinGame, createGame } from "@/src/db/queries/game";
+import { initializeGame } from "@/src/gamelogic/initializeGame";
 
 export async function handleStartNewGame(chatId: string, telegramId: string) {
   const existingUser = await findUserByTelegramId(telegramId);
@@ -32,12 +33,16 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
       if(openGame.players !== null){
         openGame.players.push(existingUser.id);
         await joinGame(openGame.id, openGame.players);
+        
+        initializeGame(chatId, openGame);
+
         await sendMessage(
           chatId,
           "You have joined the game. It will start in a few seconds.",
         );
         return;
       }
+        
     } else {
       const newGame = await createGame([existingUser.id]);
 

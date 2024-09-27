@@ -13,6 +13,7 @@ export const users = pgTable('users', {
   authTag: text('authTag').notNull(),
   iv: text('iv').notNull(),
   secretKey: text('secretKey').notNull(),
+  chatId: text('chatId').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 });
@@ -71,6 +72,7 @@ export const round = pgTable('round', {
  * @userId is the id of the user.
  * @gameId is the id of the game.
  * @totalPoints is the total points of the user in the game.
+ * @chatId is the chat id of the user.
  * @createdAt is the timestamp of the player game creation.
  * @updatedAt is the timestamp of the player game update.
  */

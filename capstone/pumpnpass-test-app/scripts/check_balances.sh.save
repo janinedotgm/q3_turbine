@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# List of keypair file paths
+keypairs=(
+  "~/payer-keypair.json"
+  "~/player1-keypair.json"
+  "~/player2-keypair.json"
+  "~/player3-keypair.json"
+  "~/player4-keypair.json"
+)
+
+# Loop through each keypair and display the balance
+for keypair in "${keypairs[@]}"
+do
+  echo "Checking balance for: $keypair"
+  solana config set --keypair $keypair > /dev/null 2>&1
+  balance=$(solana balance)
+  echo "Balance: $balance SOL"
+  echo ""
+done
+`

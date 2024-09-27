@@ -27,8 +27,8 @@ Welcome to **Pump 'n' Pass**, a game developed as the Turbine Capstone Project b
 The project folder contains the following components:
 
 1. **/pumpnpass**: Anchor implementation for handling the escrow and saving the player states.
-2. **Telegram Bot**: The front-end interface for the game, implemented as a Telegram bot.
-3. **Backend**: Supports the game logic and stores keys and other data in a database.
+2. **/pumpnpass_bot**: The front-end interface for the game, implemented as a Telegram bot.
+3. **/pumpnpass-test-app**: A test application to test the pumpnpass program.
 
 ## Architectural Diagram
 

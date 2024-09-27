@@ -31,6 +31,7 @@ export async function handleStartCommand(
       authTag: secretData.authTag,
       iv: secretData.iv,
       secretKey: secretData.encrypted,
+      chatId,
     });
 
     await sendMessage(

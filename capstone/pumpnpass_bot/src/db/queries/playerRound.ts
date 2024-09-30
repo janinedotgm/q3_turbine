@@ -1,16 +1,22 @@
 import { db } from "@/src/db";
-import { playerGame } from "@/src/db/schema";
+import { round } from "@/src/db/schema";
+import { playerRound } from "@/supabase/migrations/schema";
 import { UUID } from "crypto";
-import { game } from "@/src/db/schema";
 
-export const createPlayerRoundEntries = async (currentGame: any) => {
+export const createPlayerRoundEntries = async (currentGame: any, currentRound: any) => {
+    console.log("🚀 ~ createPlayerRoundEntries ~ currentRound:", currentRound)
+    console.log("🚀 ~ createPlayerRoundEntries ~ currentRound.id:", currentRound.id)
     try {
        for (const player of currentGame.players) {
+            console.log("🚀 ~ createPlayerRoundEntries ~ player:", player)
             
-        await db.insert(playerGame).values({
-            userId: player.id,
+        await db.insert(playerRound).values({
+            userId: player,
             gameId: currentGame.id,
-            totalPoints: 0,
+            roundId: currentRound.id,
+            roundPoints: 0,
+            pumps: 0,
+            turns: 0,
         });
        }
     } catch (error) {

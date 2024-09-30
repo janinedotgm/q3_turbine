@@ -5,7 +5,7 @@ import { round } from "@/src/db/schema";
 import { playerRound } from "@/supabase/migrations/schema";
 import { randomInt } from "crypto";
 
-export const createPlayerRoundEntries = async (currentGame: any) => {
+export const createRoundEntry = async (currentGame: any) => {
     try {
         const playerIndex = randomInt(0, currentGame.players.length - 1);
         const newRound = await db.insert(round).values({
@@ -16,8 +16,10 @@ export const createPlayerRoundEntries = async (currentGame: any) => {
             looserId: null,
             number: 0,
             activePlayerId: currentGame.players[playerIndex].id as UUID,
-        });
+        }).returning();
         console.log("🚀 ~ newRound ~ newRound:", newRound)
+
+        return newRound != null ? newRound[0] : null;
 
     } catch (error) {
         console.error(error);

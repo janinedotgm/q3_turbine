@@ -27,6 +27,7 @@ export const joinGame = async (gameId: string, players: string[]) => {
     try {
         // TODO: implement game status for multiple players
         const updatedGame = await db.update(game).set({ players: players, gamestatus: 'Active' }).where(eq(game.id, gameId));
+       
         return updatedGame;
     } catch (error) {
         console.error(error);

@@ -33,8 +33,8 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
       if(openGame.players !== null){
         openGame.players.push(existingUser.id);
         await joinGame(openGame.id, openGame.players);
-        
-        initializeGame(chatId, openGame);
+
+        await initializeGame(chatId, openGame);
 
         await sendMessage(
           chatId,

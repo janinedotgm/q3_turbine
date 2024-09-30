@@ -33,3 +33,6 @@ The project folder contains the following components:
 ## Architectural Diagram
 
 For a detailed view of the system architecture, please refer to the [architectural diagram](https://www.figma.com/board/z2UvMbEH2dUJdaMndKewYp/Pump-'n'-Pass?node-id=0-1&t=x72uyDdtDY78NBfA-1).
+
+## Pitch Deck
+https://www.figma.com/slides/RGq8y7n1DmzceP9zhZMQHb/Pump'n'pass-pitch?node-id=1-85&t=wYH4lXilDlTHBW2X-1

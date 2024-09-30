@@ -2,7 +2,7 @@
 
 import { sendMessage, answerCallbackQuery } from "../utils/telegramApi";
 import { CALLBACK_DATA } from "../constants";
-import { handleCheckBalance, handleGetWalletKey, handleStartNewGame } from "./callbacks";
+import { handleCheckBalance, handleGetWalletKey, handleStartNewGame, handlePump, handlePass } from "./callbacks";
 
 export async function handleCallbackQuery(callbackQuery: any) {
   const data = callbackQuery.data;
@@ -18,6 +18,12 @@ export async function handleCallbackQuery(callbackQuery: any) {
       break;
     case CALLBACK_DATA.START_NEW_GAME:
       await handleStartNewGame(chatId, telegramId);
+      break;
+    case CALLBACK_DATA.GAME_PUMP:
+      await handlePump(chatId, telegramId);
+      break;
+    case CALLBACK_DATA.GAME_PASS:
+      await handlePass(chatId, telegramId);
       break;
     default:
       await sendMessage(chatId, "Unknown action.");

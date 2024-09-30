@@ -34,6 +34,8 @@ export async function handleStartCommand(
       chatId,
     });
 
+    
+
     await sendMessage(
       chatId,
       `Successfully created your account, ${username}.`,

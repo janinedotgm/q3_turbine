@@ -1,6 +1,6 @@
 import { db } from "@/src/db";
-import { game } from "@/src/db/schema";
-import { eq } from "drizzle-orm";
+import { game, round } from "@/src/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export const findOpenGame = async () => {
     try {
@@ -12,6 +12,16 @@ export const findOpenGame = async () => {
     }
  
 };
+
+export const findGameById = async (gameId: string) => {
+    try {
+        const result = await db.select().from(game).where(eq(game.id, gameId)).limit(1).then((games) => games[0] || null);
+        return result;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 
 export const createGame = async (players: string[]) => {
     try {
@@ -35,3 +45,26 @@ export const joinGame = async (gameId: string, players: string[]) => {
     }
 }
 
+
+
+export const getCurrentRoundAndGame = async (gameId: string) => {
+
+    const results = await db
+        .select()
+        .from(round)
+        .innerJoin(game, eq(round.gameId, game.id))
+        .where(eq(round.gameId, gameId));
+
+    return results;
+}
+
+// export const getCurrentPlayerRoundAndRound = async (playerId: string) => {
+
+//     const results = await db
+//         .select()
+//         .from(playerRound)
+//         .innerJoin(round, eq(playerRound.roundId, round.id))
+//         .where(and(eq(playerRound.userId, playerId), eq(round.roundstatus, 'Active')));
+
+//     return results;
+// }

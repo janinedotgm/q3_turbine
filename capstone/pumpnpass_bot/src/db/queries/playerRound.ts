@@ -2,25 +2,78 @@ import { db } from "@/src/db";
 import { round } from "@/src/db/schema";
 import { playerRound } from "@/supabase/migrations/schema";
 import { UUID } from "crypto";
+import { eq, and} from "drizzle-orm";
 
-export const createPlayerRoundEntries = async (currentGame: any, currentRound: any) => {
-    console.log("🚀 ~ createPlayerRoundEntries ~ currentRound:", currentRound)
-    console.log("🚀 ~ createPlayerRoundEntries ~ currentRound.id:", currentRound.id)
+export const createPlayerRoundEntries = async (currentGame: any, currentRound: any, activePlayerId: string) => {
     try {
        for (const player of currentGame.players) {
-            console.log("🚀 ~ createPlayerRoundEntries ~ player:", player)
             
-        await db.insert(playerRound).values({
-            userId: player,
-            gameId: currentGame.id,
-            roundId: currentRound.id,
-            roundPoints: 0,
-            pumps: 0,
-            turns: 0,
-        });
+            await db.insert(playerRound).values({
+                userId: player,
+                gameId: currentGame.id,
+                roundId: currentRound.id,
+                roundPoints: 0,
+                pumps: 0,
+                turns: activePlayerId === player ? 1 : 0,
+            });
        }
     } catch (error) {
         console.error(error);
         return null;
     }
+}
+
+export const getCurrentPlayerRoundAndRound = async (playerId: string) => {
+
+    const results = await db
+        .select()
+        .from(playerRound)
+        .innerJoin(round, eq(playerRound.roundId, round.id))
+        .where(and(eq(playerRound.userId, playerId), eq(round.roundstatus, 'Active')));
+
+    return results;
+}
+
+export const updateCurrentPlayerRoundAndRound = async (newRound: any, newPlayerRound: any, playerId: string) => {
+
+    const transaction = await db.transaction(async (trx) => {
+        // First, update the Round table based 
+        const roundResult = await trx
+            .update(round)
+            .set({...newRound})
+            .where(and(eq(round.id, newPlayerRound.roundId), eq(round.roundstatus, 'Active'))).returning(); 
+
+        // Then, update the PlayerRound table
+        const playerRoundResult = await trx
+            .update(playerRound)
+            .set({
+                ...newPlayerRound,
+            })
+            .where(and(eq(playerRound.userId, playerId), eq(playerRound.id, newPlayerRound.id))).returning(); 
+
+        return {roundResult, playerRoundResult};
+    });
+
+    return transaction;
+}
+
+export const updateAllPlayerRoundsAndRound = async (newRound: any, newPlayerRound: any) => {
+    const transaction = await db.transaction(async (trx) => {
+        // First, update the Round table based 
+        const roundResult = await trx
+            .update(round)
+            .set({...newRound})
+            .where(and(eq(round.id, newPlayerRound.roundId), eq(round.roundstatus, 'Active'))).returning(); 
+
+        // Then, update the PlayerRound table
+        const playerRoundResult = await trx
+            .update(playerRound)
+            .set({
+                ...newPlayerRound,
+            })
+            .where(eq(playerRound.roundId, newPlayerRound.roundId)).returning(); 
+
+        return {roundResult, playerRoundResult};
+    });
+
 }

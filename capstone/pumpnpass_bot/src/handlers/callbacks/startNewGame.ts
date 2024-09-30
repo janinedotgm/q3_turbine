@@ -2,9 +2,11 @@
 import { sendMessage } from "../../utils/telegramApi";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getBalance } from "@/src/services/wallet";
-import { createMainMenuKeyboard } from "@/src/utils/keyboards";
+import { createGameActionKeyboard, createMainMenuKeyboard } from "@/src/utils/keyboards";
 import { findOpenGame, joinGame, createGame } from "@/src/db/queries/game";
 import { initializeGame } from "@/src/gamelogic/initializeGame";
+import { findUserById } from "@/src/db/queries/users";
+import { notifyFirstPlayer } from "../commands/notifyFirstPlayer";
 
 export async function handleStartNewGame(chatId: string, telegramId: string) {
   const existingUser = await findUserByTelegramId(telegramId);
@@ -34,15 +36,22 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
         openGame.players.push(existingUser.id);
         await joinGame(openGame.id, openGame.players);
 
-        await initializeGame(chatId, openGame);
-
         await sendMessage(
           chatId,
           "You have joined the game. It will start in a few seconds.",
         );
-        return;
+
+        const newRound = await initializeGame(chatId, openGame);
+
+        if(newRound && newRound.activePlayerId){
+          const currentPlayer = await findUserById(newRound.activePlayerId);
+
+          notifyFirstPlayer(currentPlayer);
+          
+        } else {
+          throw new Error("No active player found");
+        }
       }
-        
     } else {
       const newGame = await createGame([existingUser.id]);
 

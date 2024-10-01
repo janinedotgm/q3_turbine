@@ -23,6 +23,21 @@ export const createPlayerRoundEntries = async (currentGame: any, currentRound: a
     }
 }
 
+export const updatePlayerRound = async (newPlayerRound: any) => {
+    const updatedPlayerRound = await db.update(playerRound).set({...newPlayerRound}).where(eq(playerRound.id, newPlayerRound.id));
+    return updatedPlayerRound;
+}
+
+export const getPlayerRound = async (playerId: string, roundId: string) => {
+    const results = await db.select().from(playerRound).where(and(eq(playerRound.userId, playerId), eq(playerRound.roundId, roundId)));
+    return results;
+}
+
+export const getAllPlayerRoundsInRound = async (roundId: string) => {
+    const results = await db.select().from(playerRound).where(eq(playerRound.roundId, roundId));
+    return results;
+}
+
 export const getCurrentPlayerRoundAndRound = async (playerId: string) => {
 
     const results = await db
@@ -77,3 +92,4 @@ export const updateAllPlayerRoundsAndRound = async (newRound: any, newPlayerRoun
     });
 
 }
+

@@ -9,7 +9,9 @@ import { updatePlayerGameTotalPoints } from "@/src/db/queries/playerGame";
 import { notifyNextPlayer } from "@/src/handlers/commands/notifyNextPlayer";
 import { randomInt } from "crypto";
 import { updateRound } from "@/src/db/queries/round";
-
+import { updatePlayerRound, getPlayerRound, getAllPlayerRoundsInRound } from "@/src/db/queries/playerRound";
+import { getPlayerGamesForGame } from "@/src/db/queries/playerGame";
+import { notifyGameEnd } from "@/src/handlers/commands/notifyGameEnd";
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
     // Create first round
@@ -33,7 +35,7 @@ const initializeRound = async (currentGame: any) => {
     return newRound;
 }
 
-export const endRound = async (currentRound: any, playerRound: any) => {
+export const endRound = async (currentRound: any) => {
     const game = await findGameById(currentRound.gameId);
 
     if(!game) {
@@ -45,7 +47,12 @@ export const endRound = async (currentRound: any, playerRound: any) => {
         throw new Error("Players not found");
     }
 
-    await updatePlayerGameTotalPoints(playerRound.gameId, playerRound.userId, playerRound.roundPoints);
+    const playerRounds = await getAllPlayerRoundsInRound(currentRound.id);
+
+    for(const playerRound of playerRounds){
+        await updatePlayerGameTotalPoints(playerRound.gameId, playerRound.userId, playerRound.roundPoints);
+    }
+
 
     if(currentRound.number >= MAX_ROUNDS){
         //finish game
@@ -59,8 +66,18 @@ export const endRound = async (currentRound: any, playerRound: any) => {
 }
 
 const finishGame = async (game: any) => {
-    // TODO: finish game
-    console.log('TODO:implement finish game');
+    
+    const playerGames = await getPlayerGamesForGame(game.id);
+    playerGames.sort((a: any, b: any) => b.totalPoints - a.totalPoints);
+
+    for(const playerGame of playerGames){
+        const player = await findUserById(playerGame.userId);
+        await notifyGameEnd(player, playerGames);
+
+
+    }
+    
+
 }
 
 const nextRound = async (game: any, nextRoundNumber: number, lastActivePlayerId: string) => {
@@ -78,7 +95,7 @@ const nextRound = async (game: any, nextRoundNumber: number, lastActivePlayerId:
 
 const getNextActivePlayer = (playersInGame: string[], lastActivePlayerId: string | null) => {
     let possibleNextPlayers = playersInGame;
-    let substractor = 1;
+    let substractor = 0;
 
     if(lastActivePlayerId !== null){
         possibleNextPlayers = playersInGame.filter((player: any) => player !== lastActivePlayerId);
@@ -99,6 +116,7 @@ export const passToNextPlayer = async (round: any, playerRound: any, lastActiveP
     if(!game) {
         throw new Error("Game not found");
     }
+
     const players = game.players;
     if(!players) {
         throw new Error("Players not found");
@@ -106,9 +124,14 @@ export const passToNextPlayer = async (round: any, playerRound: any, lastActiveP
     const nextActivePlayerId = getNextActivePlayer(players, lastActivePlayerId);   
 
     round.activePlayerId = nextActivePlayerId;
-    await updateRound(round.id, round);
+    await updateRound(round);
+
     // create playerRound entries
-    await createPlayerRoundEntries(game, playerRound, nextActivePlayerId);
+    // await createPlayerRoundEntries(game, playerRound, nextActivePlayerId);
     const currentPlayer = await findUserById(nextActivePlayerId);
+    const currentPlayerRound = await getPlayerRound(currentPlayer.id, playerRound.roundId);
+    currentPlayerRound[0].turns += 1;
+    await updatePlayerRound(currentPlayerRound[0]);
+    console.log("hi3 =================================================================");
     notifyNextPlayer(currentPlayer);
 }

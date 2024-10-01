@@ -3,6 +3,8 @@ import { PUMP_MIN_PRICE, PUMP_MAX_PRICE } from "@/src/utils/constants";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getCurrentPlayerRoundAndRound, updateCurrentPlayerRoundAndRound } from "@/src/db/queries/playerRound";
 import { passToNextPlayer } from "@/src/gamelogic/initializeGame";
+import { sendPassedMsg } from "@/src/handlers/commands/gameMsg";
+import { updatePlayerGameTotalPoints } from "@/src/db/queries/playerGame";
 
 
 export const handlePass = async (chatId: string, telegramId: string) => {
@@ -16,9 +18,10 @@ export const handlePass = async (chatId: string, telegramId: string) => {
     const roundInfo = await getCurrentPlayerRoundAndRound(player.id);
 
     let round = roundInfo[0].round;
-    let playerRound = roundInfo[0].playerRound;
+    let playerRound = roundInfo[0].playerRound;           
 
-    const {roundResult, playerRoundResult} = await updateCurrentPlayerRoundAndRound(round, playerRound, player.id);
-    await passToNextPlayer(roundResult[0], roundResult[0], player.id);
+    // const result = await updatePlayerGameTotalPoints(round.gameId, playerRound.userId, playerRound.roundPoints);
 
+    await passToNextPlayer(round, playerRound, player.id);
+    sendPassedMsg(player);
 }

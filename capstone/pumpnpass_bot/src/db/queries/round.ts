@@ -6,6 +6,7 @@ import { playerRound } from "@/supabase/migrations/schema";
 import { randomInt } from "crypto";
 import { PUMP_MIN_AMOUNT, PUMP_MAX_AMOUNT } from "@/src/utils/constants";
 import { eq } from "drizzle-orm";
+
 export const createRoundEntry = async (currentGame: any, roundNumber: number, activePlayerId: string) => {
     try {
         const newRound = await db.insert(round).values({
@@ -26,8 +27,8 @@ export const createRoundEntry = async (currentGame: any, roundNumber: number, ac
     }
 }
 
-export const updateRound = async (roundId: string, newRound: any) => {
-    const updatedRound = await db.update(round).set(newRound).where(eq(round.id, roundId));
+export const updateRound = async (newRound: any) => {
+    const updatedRound = await db.update(round).set({...newRound}).where(eq(round.id, newRound.id));
     return updatedRound;
 }
 

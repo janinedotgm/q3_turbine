@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
     "@neondatabase/serverless": "^0.9.5",
     "@solana/web3.js": "^1.95.3",
     "@tanstack/react-query": "^5.56.2",

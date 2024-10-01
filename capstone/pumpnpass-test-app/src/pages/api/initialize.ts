@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const gameId = Date.now();
             // const seed = new anchor.BN(Date.now());
-            const seed = new anchor.BN(randomBytes(8)); // TODO: make seed a combo of timestamp and nonce        
+            const seed = new anchor.BN(randomBytes(8)); // TODO: Use gameId as seed      
             
             // const nonce = randomBytes(4); // 4 bytes for nonce
             // const timestamp = Buffer.from(Date.now().toString()); // Convert timestamp to buffer

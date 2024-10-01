@@ -45,6 +45,15 @@ export const joinGame = async (gameId: string, players: string[]) => {
     }
 }
 
+export const updateGameSeed = async (gameId: string, seed: string) => {
+    try {
+        const updatedGame = await db.update(game).set({ seed: seed }).where(eq(game.id, gameId));
+        return updatedGame;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 
 
 export const getCurrentRoundAndGame = async (gameId: string) => {

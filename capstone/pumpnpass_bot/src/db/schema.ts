@@ -34,6 +34,7 @@ export const game = pgTable('game', {
   rounds: integer('rounds').notNull().default(2),
   currentRound: integer('currentRound').notNull().default(0),
   players: uuid('players').references(() => users.id).array(),
+  seed: text('seed'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 });

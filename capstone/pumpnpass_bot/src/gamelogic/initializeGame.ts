@@ -13,6 +13,7 @@ import { updatePlayerRound, getPlayerRound, getAllPlayerRoundsInRound } from "@/
 import { getPlayerGamesForGame } from "@/src/db/queries/playerGame";
 import { notifyGameEnd } from "@/src/handlers/commands/notifyGameEnd";
 import { sendGameStartMsg } from "@/src/handlers/commands/gameStart";
+import { initializeGameOnChain } from "@/src/solana/escrow";
 
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
@@ -25,9 +26,12 @@ export const initializeGame = async (chatId: string, currentGame: any) => {
     // Create PlayerRound entry in db
     await createPlayerRoundEntries(currentGame, newRound, newRound?.activePlayerId ?? '');
 
-    // TODO: initialize on chain
+    
 
     const players = await findUsersByIds(currentGame.players);
+    const publicKeys = players.map((player: any) => player.publicKey);
+    await initializeGameOnChain(currentGame.id, publicKeys);
+
     for(const player of players){
         await sendGameStartMsg(player.telegramId);
     }

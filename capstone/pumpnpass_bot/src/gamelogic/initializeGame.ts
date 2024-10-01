@@ -12,6 +12,8 @@ import { updateRound } from "@/src/db/queries/round";
 import { updatePlayerRound, getPlayerRound, getAllPlayerRoundsInRound } from "@/src/db/queries/playerRound";
 import { getPlayerGamesForGame } from "@/src/db/queries/playerGame";
 import { notifyGameEnd } from "@/src/handlers/commands/notifyGameEnd";
+import { sendGameStartMsg } from "@/src/handlers/commands/gameStart";
+
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
     // Create first round
@@ -25,6 +27,10 @@ export const initializeGame = async (chatId: string, currentGame: any) => {
 
     // TODO: initialize on chain
 
+    const players = await findUsersByIds(currentGame.players);
+    for(const player of players){
+        await sendGameStartMsg(player.telegramId);
+    }
     return newRound;
 }
 
@@ -132,6 +138,5 @@ export const passToNextPlayer = async (round: any, playerRound: any, lastActiveP
     const currentPlayerRound = await getPlayerRound(currentPlayer.id, playerRound.roundId);
     currentPlayerRound[0].turns += 1;
     await updatePlayerRound(currentPlayerRound[0]);
-    console.log("hi3 =================================================================");
     notifyNextPlayer(currentPlayer);
 }

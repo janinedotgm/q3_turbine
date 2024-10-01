@@ -35,7 +35,6 @@ export const handlePump = async (chatId: string, telegramId: string) => {
         playerRound.pumps += 1;
 
         const result = await updateCurrentPlayerRoundAndRound(round, playerRound, player.id);
-        console.log("🚀 ~ handlePump ~ result:", result)
         await endRound(round);
     }else {
         const price = randomInt(PUMP_MIN_PRICE, round.maxPumps - round.currentPumps);

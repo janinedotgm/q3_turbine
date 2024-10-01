@@ -31,8 +31,5 @@ export const updatePlayerGameTotalPoints = async (gameId: string, userId: string
         throw new Error("A user can only have one playerGame entry per game");
     }
 
-    console.log("🚀 ~ updatePlayerGameTotalPoints ~ results:", results)
-
     await db.update(playerGame).set({totalPoints: currentPlayerGame.totalPoints + totalRoundPoints}).where(and(and(eq(playerGame.gameId, gameId), eq(playerGame.userId, userId))));
-    console.log("🚀 ~ updatePlayerGameTotalPoints ~ after update")
 }

@@ -4,12 +4,8 @@ import { findGameById } from "../../db/queries/game";
 import { findUsersByIds } from "../../db/queries/users";
 
 export const notifyGameEnd = async (player: any, playerGames: any[]) => {
-    console.log("🚀 ~ notifyGameEnd ~ playerGame:", playerGames)
-    console.log("🚀 ~ notifyGameEnd ~ player:", player)
     const playerNumber = playerGames.length;
-    console.log("🚀 ~ notifyGameEnd ~ playerNumber:", playerNumber)
     const playerPosition = playerGames.findIndex((pg: any) => pg.userId === player.id);
-    console.log("🚀 ~ notifyGameEnd ~ playerPosition:", playerPosition)
     
     switch(player.id){
         case playerGames[0].userId:

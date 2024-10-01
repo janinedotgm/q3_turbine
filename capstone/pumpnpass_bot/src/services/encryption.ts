@@ -6,8 +6,6 @@ const algorithm = "aes-256-gcm";
 // Ensure that the key is 32 bytes (256 bits) for AES-256.
 const key = Buffer.from(process.env.ENCRYPTION_KEY || "", "hex");
 
-console.log(`key length: ${key.length}`);
-
 if (key.length !== 32) {
   throw new Error(
     "Encryption key must be 32 bytes (256 bits) long. KEY LENGTH: " + key.length

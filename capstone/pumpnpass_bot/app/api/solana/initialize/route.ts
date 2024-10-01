@@ -16,6 +16,7 @@ import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; // Your pro
 import { randomBytes } from 'crypto';
 import { writeFileSync } from 'fs';
 import { updateGameSeed } from '../../../../src/db/queries/game';
+import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
 export const runtime = "nodejs";
 
@@ -43,24 +44,18 @@ const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
 export async function POST(request: NextRequest) {
   try {
     const {gameId, publicKeys} = await request.json();
-    console.log("🚀 ~ POST ~ gameId:", gameId)
-    console.log("🚀 ~ POST ~ publicKeys:", publicKeys)
-    console.log('hi !!!!!!!!!!!!!!!!!!!!!!!')
 
-    const wallet = new anchor.Wallet(payer);
-    const provider = new anchor.AnchorProvider(connection, wallet, { preflightCommitment: "recent" });
+    const wallet = new NodeWallet(payer);
+
+    const anchorWallet = wallet as anchor.Wallet;
+    
+    const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "confirmed" });
     anchor.setProvider(provider);
     
     // Load the program with IDL and program ID
     const program = new anchor.Program<PumpNPass>(IDL, provider);
 
-    // const seed = new anchor.BN(Date.now());
     const seed = new anchor.BN(randomBytes(8)); // TODO: Use gameId as seed      
-    
-    // const nonce = randomBytes(4); // 4 bytes for nonce
-    // const timestamp = Buffer.from(Date.now().toString()); // Convert timestamp to buffer
-    // const seedBuffer = Buffer.concat([nonce, timestamp]); 
-    // const seed = new anchor.BN(seedBuffer.toString('hex'), 16);
 
     const [escrow] = PublicKey.findProgramAddressSync(
         [
@@ -79,7 +74,6 @@ export async function POST(request: NextRequest) {
 
     const duration = new anchor.BN(3600);
     const amount = new anchor.BN(0.05 * LAMPORTS_PER_SOL);
-    // const latestBlockHash = await connection.getLatestBlockhash();
 
     let tx = await program.methods
         .initialize(

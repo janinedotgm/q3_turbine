@@ -1,6 +1,7 @@
 import { db } from "@/src/db";
 import { game, round } from "@/src/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, arrayContains } from "drizzle-orm";
+import { DEPOSIT_PER_PLAYER } from "@/src/utils/constants";
 
 export const findOpenGame = async () => {
     try {
@@ -25,7 +26,7 @@ export const findGameById = async (gameId: string) => {
 
 export const createGame = async (players: string[]) => {
     try {
-        const newGame = await db.insert(game).values({ players: players, gamestatus: 'Open' }).returning();
+        const newGame = await db.insert(game).values({ players: players, gamestatus: 'Open'}).returning();
         return newGame;
     } catch (error) {
         console.error(error);
@@ -63,6 +64,15 @@ export const getCurrentRoundAndGame = async (gameId: string) => {
         .from(round)
         .innerJoin(game, eq(round.gameId, game.id))
         .where(eq(round.gameId, gameId));
+
+    return results;
+}
+
+export const findActiveGameByUserId = async (uuid: string) => {
+    const results = await db
+        .select()
+        .from(game)
+        .where(and(eq(game.gamestatus, 'Active'), arrayContains(game.players, [uuid])));
 
     return results;
 }

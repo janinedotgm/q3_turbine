@@ -46,7 +46,7 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
         if(newRound && newRound.activePlayerId){
           const currentPlayer = await findUserById(newRound.activePlayerId);
 
-          notifyFirstPlayer(currentPlayer);
+          // notifyFirstPlayer(currentPlayer);
           
         } else {
           throw new Error("No active player found");

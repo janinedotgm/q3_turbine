@@ -5,20 +5,17 @@ import {
     PublicKey,
     Keypair,
     SystemProgram,
-    Transaction,
     LAMPORTS_PER_SOL
 } from '@solana/web3.js';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
-import * as anchor from "@coral-xyz/anchor"; // Corrected import
-import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; // Your program and IDL
+import * as anchor from "@coral-xyz/anchor"; 
+import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
 import { randomBytes } from 'crypto';
-import { writeFileSync } from 'fs';
 import { updateGameSeed } from '../../../../src/db/queries/game';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
-export const runtime = "nodejs";
+// export const runtime = "nodejs";
 
 const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
 const connection = new Connection(process.env.RPC_URL ?? '');
@@ -36,14 +33,15 @@ const payer = loadKeypair(`${homeDir}/payer-keypair.json`);
 
 // Save the seed to a file
 const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
-    console.log("🚀 ~ saveSeedToFile ~ seed:", seed)
-    console.log("🚀 ~ saveSeedToFile ~ gameId:", gameId)
-    updateGameSeed(gameId, seed);
+    const seedHex = seed.toString('hex'); // Convert seed to hex
+    console.log("🚀 ~ saveSeedToFile ~ seedHex:", seedHex);
+    console.log("🚀 ~ saveSeedToFile ~ gameId:", gameId);
+    updateGameSeed(gameId, seedHex); // Store as hex
 };
 
 export async function POST(request: NextRequest) {
   try {
-    const {gameId, publicKeys} = await request.json();
+    const {gameId, depositPerPlayer} = await request.json();
 
     const wallet = new NodeWallet(payer);
 
@@ -71,9 +69,9 @@ export async function POST(request: NextRequest) {
         escrow,
         systemProgram: SystemProgram.programId,
     };
-
+    
     const duration = new anchor.BN(3600);
-    const amount = new anchor.BN(0.05 * LAMPORTS_PER_SOL);
+    const amount = new anchor.BN(depositPerPlayer * LAMPORTS_PER_SOL);
 
     let tx = await program.methods
         .initialize(
@@ -85,6 +83,7 @@ export async function POST(request: NextRequest) {
         .signers([payer])
         .rpc();
 
+    
     console.log("🚀 ~ handler ~ tx:", tx)
 
     saveSeedToFile(gameId, seed);

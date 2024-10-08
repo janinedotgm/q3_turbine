@@ -25,3 +25,13 @@ export const createGameActionKeyboard = () => ({
     ],
   ],
 });
+
+// Deposit Keyboard
+export const createDepositKeyboard = (depositPerPlayer: number) => ({
+  inline_keyboard: [
+    [
+      { text: `Deposit ${depositPerPlayer} SOL`, callback_data: `DEPOSIT_${depositPerPlayer}` },
+      { text: "Cancel", callback_data: "CANCEL_DEPOSIT" }
+    ],
+  ],
+});

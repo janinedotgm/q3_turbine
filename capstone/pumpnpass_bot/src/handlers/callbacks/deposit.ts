@@ -10,11 +10,18 @@ export async function handleDeposit(chatId: string, telegramId: string, depositA
   const result = await depositGameBet(telegramId, depositAmount);
   console.log("🚀 ~ handleDeposit ~ result:", result);
 
-  await sendMessage(
-    chatId,
-    `Deposit successful!`,
-    createMainMenuKeyboard()
-  );
+  if(result.status === 200) {
+
+    await sendMessage(
+      chatId,
+      `Deposit successful!`
+    );
+  } else {
+    await sendMessage(
+      chatId,
+      `Deposit failed!`
+    );
+  }
 }
 
 export async function handleCancelDeposit(chatId: string, telegramId: string) {

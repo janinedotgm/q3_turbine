@@ -26,7 +26,7 @@ export const findGameById = async (gameId: string) => {
 
 export const createGame = async (players: string[]) => {
     try {
-        const newGame = await db.insert(game).values({ players: players, gamestatus: 'Open'}).returning();
+        const newGame = await db.insert(game).values({ players: players, gamestatus: 'Open', deposit_per_player: DEPOSIT_PER_PLAYER.toString()}).returning();
         return newGame;
     } catch (error) {
         console.error(error);

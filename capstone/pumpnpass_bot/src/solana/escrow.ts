@@ -22,3 +22,35 @@ export const initializeGameOnChain = async (gameId: string, publicKeys: string[]
     console.log("🚀 ~ initializeGameOnChain ~ data:", data);
     return data;
 };
+
+export const saveScoreOnChain = async (player: any, score: number) => {
+    const response = await fetch(`${baseUrl}/api/solana/save-score`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ player, score }),   
+    });
+
+}   
+
+export const distributeFunds = async (player: any) => {
+    const response = await fetch(`${baseUrl}/api/solana/distribute`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ player }),   
+    });
+
+}
+
+export const finalizeGameOnChain = async (playerGames: any[], seedHex: string) => {
+    const response = await fetch(`${baseUrl}/api/solana/finalize-game`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playerGames, seedHex }),   
+    });
+}

@@ -1,12 +1,47 @@
-
 import { sendMessage } from "../../utils/telegramApi";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getBalance } from "@/src/services/wallet";
-import { createGameActionKeyboard, createMainMenuKeyboard } from "@/src/utils/keyboards";
+import { createGameActionKeyboard, createTopUpKeyboard } from "@/src/utils/keyboards";
 import { findOpenGame, joinGame, createGame } from "@/src/db/queries/game";
 import { initializeGame } from "@/src/gamelogic/initializeGame";
 import { findUserById } from "@/src/db/queries/users";
 import { notifyFirstPlayer } from "../commands/notifyFirstPlayer";
+import { createHash } from "crypto";
+
+const createMercuryoUrl = (publicKey: string) => {
+  const address = publicKey;
+  const secret = 'secret';
+
+  // Generate the signature using sha512
+  const signatureInput = `${address}${secret}`;
+  const signature = createHash('sha512').update(signatureInput).digest('hex');
+
+  const baseUrl = 'https://exchange.mercuryo.io/';
+  const widgetId = '5383c58a-0f6a-45cd-937a-bc2c79e18076';
+
+  // Defining query parameters
+  const params = {
+    widget_id: widgetId,
+    type: 'sell',
+    currency: 'SOL',
+    network: 'SOLANA',
+    amount: 0.2,
+    fiat_currency: 'EUR',
+    address: address,
+    signature: signature,
+  };
+
+  // Convert all values in params to strings
+  const stringParams = Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [key, String(value)])
+  );
+
+  // Function to serialize the parameters as query string
+  const queryString = new URLSearchParams(stringParams).toString();
+  const finalUrl = `${baseUrl}?${queryString}`;
+
+  return finalUrl;
+};
 
 export async function handleStartNewGame(chatId: string, telegramId: string) {
   const existingUser = await findUserByTelegramId(telegramId);
@@ -22,10 +57,11 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
   const balance = await getBalance(existingUser.publicKey);
   
   if (balance < 0.01) {
+    const mercuryoUrl = createMercuryoUrl(existingUser.publicKey);
     await sendMessage(
       chatId,
-      "You need 0.01 SOL to start a new game. Please top up your wallet first.",
-      createMainMenuKeyboard()
+      `You need 0.01 SOL to start a new game. Please top up your wallet first.`,
+      createTopUpKeyboard(mercuryoUrl)
     );
     return;
   } else {
@@ -42,15 +78,6 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
         );
 
         const newRound = await initializeGame(chatId, openGame);
-
-        if(newRound && newRound.activePlayerId){
-          const currentPlayer = await findUserById(newRound.activePlayerId);
-
-          // notifyFirstPlayer(currentPlayer);
-          
-        } else {
-          throw new Error("No active player found");
-        }
       }
     } else {
       const newGame = await createGame([existingUser.id]);
@@ -62,7 +89,4 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
       return;
     }
   }
-  
-  
-  
 }

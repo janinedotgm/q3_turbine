@@ -14,6 +14,10 @@ import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass';
 import { randomBytes } from 'crypto';
 import { updateGameSeed } from '../../../../src/db/queries/game';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
+import { TransactionType, Helius } from 'helius-sdk';
+
+const helius = new Helius(process.env.HELIUS_API_KEY ?? '');
+const baseUrl = 'https://49f5-24-40-157-2.ngrok-free.app'; //process.env.BASE_URL;
 
 // export const runtime = "nodejs";
 
@@ -82,6 +86,13 @@ export async function POST(request: NextRequest) {
         .accounts(accounts)
         .signers([payer])
         .rpc();
+
+        // TODO: Webhook was to slow, find another solution
+        // helius.createWebhook({
+        //   accountAddresses: [escrow.toBase58()],
+        //   transactionTypes: [TransactionType.ANY],
+        //   webhookURL: `${baseUrl}/api/solana/webhook`,
+        // });
 
     
     console.log("🚀 ~ handler ~ tx:", tx)

@@ -1,5 +1,5 @@
 import { db } from "@/src/db";
-import { playerGame } from "@/src/db/schema";
+import { playerGame, users } from "@/src/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export const createPlayerGameEntries = async (currentGame: any) => {
@@ -32,4 +32,9 @@ export const updatePlayerGameTotalPoints = async (gameId: string, userId: string
     }
 
     await db.update(playerGame).set({totalPoints: currentPlayerGame.totalPoints + totalRoundPoints}).where(and(and(eq(playerGame.gameId, gameId), eq(playerGame.userId, userId))));
+}
+
+export const getPlayerGameByUserId = async (userId: string) => {
+    const results = await db.select().from(playerGame).where(eq(playerGame.userId, userId));
+    return results;
 }

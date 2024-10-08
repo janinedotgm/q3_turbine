@@ -14,6 +14,10 @@ import { getPlayerGamesForGame } from "@/src/db/queries/playerGame";
 import { notifyGameEnd } from "@/src/handlers/commands/notifyGameEnd";
 import { sendGameStartMsg } from "@/src/handlers/commands/gameStart";
 import { initializeGameOnChain } from "@/src/solana/escrow";
+import { notifyFirstPlayer } from "../handlers/commands/notifyFirstPlayer";
+import { getCurrentRoundAndGame } from "@/src/db/queries/game";
+import { notifyWaitingPlayers } from "../handlers/commands/notifyWaitingPlayers";
+import { saveScoreOnChain, distributeFunds, finalizeGameOnChain } from "@/src/solana/escrow";
 
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
@@ -67,10 +71,10 @@ export const endRound = async (currentRound: any) => {
     if(currentRound.number >= MAX_ROUNDS){
         //finish game
         await finishGame(game);
+        await finalizeGame(game);
     }else{
         // next round
         await nextRound(game, currentRound.number + 1, currentRound.activePlayerId);
-        
     }
 
 }
@@ -82,12 +86,21 @@ const finishGame = async (game: any) => {
 
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
+        const res = await saveScoreOnChain(player, playerGame.totalPoints);
+        // const distributeRes = await distributeFunds(player);
+        // console.log("🚀 ~ finishGame ~ distributeRes:", distributeRes)
         await notifyGameEnd(player, playerGames);
-
-
     }
-    
+}
 
+const finalizeGame = async (game: any) => {
+    const playerGames = await getPlayerGamesForGame(game.id);
+    const finalizeGameRes = await finalizeGameOnChain(playerGames, game.seed);
+    console.log("🚀 ~ finalizeGame ~ finalizeGameRes:", finalizeGameRes)
+}
+
+const closeGame = async (game: any) => {
+    console.log("Closing game and distributing funds =================================================");
 }
 
 const nextRound = async (game: any, nextRoundNumber: number, lastActivePlayerId: string) => {
@@ -143,4 +156,31 @@ export const passToNextPlayer = async (round: any, playerRound: any, lastActiveP
     currentPlayerRound[0].turns += 1;
     await updatePlayerRound(currentPlayerRound[0]);
     notifyNextPlayer(currentPlayer);
+}
+
+export const startGame = async (gameId: string) => {
+    console.log("🚀 ~ startGame ~ gameId:", gameId)
+
+    const res = await getCurrentRoundAndGame(gameId);
+    const round = res[0].round;
+    const game = res[0].game;
+
+    if(!game.players) {
+        throw new Error("Players not found");
+    }
+
+    const players = game.players.filter((player: any) => player !== round?.activePlayerId);
+    console.log("🚀 ~ startGame ~ round?.activePlayerId:", round?.activePlayerId)
+    console.log("🚀 ~ startGame ~ players:", players);
+    
+    if(round && round.activePlayerId){
+        const currentPlayer = await findUserById(round.activePlayerId);
+
+        notifyFirstPlayer(currentPlayer);
+        const playersToNotify = await findUsersByIds(players);
+        notifyWaitingPlayers(playersToNotify);
+    
+    } else {
+        throw new Error("No active player found");
+    }
 }

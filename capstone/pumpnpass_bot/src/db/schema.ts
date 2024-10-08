@@ -1,6 +1,7 @@
-import { integer, pgTable, boolean, PgArray, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, numeric, text, timestamp } from 'drizzle-orm/pg-core';
 import { uuid } from 'drizzle-orm/pg-core';
 import { gameStatusEnum, roundStatusEnum } from './enums';
+import { double } from 'drizzle-orm/mysql-core';
 
 /**
  * Users
@@ -35,7 +36,7 @@ export const game = pgTable('game', {
   currentRound: integer('currentRound').notNull().default(0),
   players: uuid('players').references(() => users.id).array(),
   seed: text('seed'),
-  deposit_per_player: integer('deposit_per_player').notNull().default(0.05), // 0.05 SOL
+  deposit_per_player: numeric('deposit_per_player').notNull().default('0.05'), // 0.05 SOL
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 });

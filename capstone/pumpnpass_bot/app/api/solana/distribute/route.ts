@@ -17,23 +17,20 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
-        const { amount, telegramId } = await request.json();
-        console.log("🚀 ~ POST ~ telegramId:", telegramId);
-        console.log("🚀 ~ POST ~ amount:", amount);
+        const { player } = await request.json();
 
-        if (!amount || !telegramId) {
-            return NextResponse.json({ status: 400, message: "Amount and telegram ID are required" });
+        if (!player) {
+            return NextResponse.json({ status: 400, message: "Player is required" });
         }
     
         const wallet = new NodeWallet(payer);
 
         const anchorWallet = wallet as anchor.Wallet;
-        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "recent" });
+        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "confirmed" });
         anchor.setProvider(provider);
         
         const program = new anchor.Program<PumpNPass>(IDL, provider);
 
-        const player = await findUserByTelegramId(telegramId);
         const playerPublicKey = new PublicKey(player.publicKey);
 
         // Ensure player.secretKey, player.iv, and player.authTag are hex-encoded
@@ -66,7 +63,9 @@ export async function POST(request: NextRequest) {
         console.log("🚀 ~ POST ~ escrow:", escrow)
 
         const [playerAccount] = PublicKey.findProgramAddressSync(
-            [Buffer.from("player"), playerPublicKey.toBuffer(), seed.toArrayLike(Buffer, "le", 8)],
+            [Buffer.from("player"), 
+                playerPublicKey.toBuffer(), 
+                seed.toArrayLike(Buffer, "le", 8)],
             program.programId
         );
 
@@ -78,33 +77,20 @@ export async function POST(request: NextRequest) {
             systemProgram: SystemProgram.programId,
         };
 
-        const lamports = amount*LAMPORTS_PER_SOL;
         let tx = await program.methods
-            .deposit(seed, new anchor.BN(lamports))
+            .distributefunds() 
+            .signers([playerKeypair])
             .accounts(accounts)
-            .signers([playerKeypair, payer])
             .rpc();
 
-        console.log('Deposit successful', tx);
+        console.log('Withdrawal successful', tx);
 
-        const balance = await connection.getBalance(escrow) / LAMPORTS_PER_SOL;
-        console.log("🚀 ~ POST ~ balance:", balance)
 
-        const depositPerPlayer = parseFloat(game[0].deposit_per_player);
-        const expectedBalance = depositPerPlayer * game[0].players!.length;
-        console.log("🚀 ~ POST ~ expectedBalance:", expectedBalance)
-
-        if(balance >= expectedBalance) {
-            console.log("Starting game -> notify players");
-            await startGame(game[0].id);
-            
-        }
-
-    return NextResponse.json({ status: 200, message: "Deposit successful" });
+    return NextResponse.json({ status: 200, message: "Distribution successful" });
   } catch (error) {
-    console.error("Error depositing funds:", error);
+    console.error("Error distributing funds:", error);
     return NextResponse.json(
-      { error: "Error depositing funds" },
+      { error: "Error distributing funds" },
       { status: 500 }
     );
   }

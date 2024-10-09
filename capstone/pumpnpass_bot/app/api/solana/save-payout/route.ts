@@ -5,7 +5,7 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
 import { loadKeypair, readSeedFromFile } from '../../../../src/utils/chainhelpers';
 import { decrypt } from '../../../../src/services/encryption';
-import { findUserByTelegramId } from '../../../../src/db/queries/users';
+import { findUserById, findUserByTelegramId } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 import { findActiveGameByUserId } from '../../../../src/db/queries/game';
 import { startGame } from '../../../../src/gamelogic/initializeGame';
@@ -17,10 +17,48 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
-        const { escrow, payout, player } = await request.json();
+        const { escrow, payout, player, seedHex } = await request.json();
         console.log("🚀 ~ POST ~ player:", player)
         console.log("🚀 ~ POST ~ payout:", payout)
         console.log("🚀 ~ POST ~ escrow:", escrow)
+        console.log("🚀 ~ POST ~ seed:", seedHex)
+        const seed = new anchor.BN(seedHex, 'hex');
+        const wallet = new NodeWallet(payer);
+
+        const anchorWallet = wallet as anchor.Wallet;
+        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "finalized" });
+        anchor.setProvider(provider);
+        
+        const program = new anchor.Program<PumpNPass>(IDL, provider);
+
+        const user = await findUserById(player.userId);
+        const playerPublicKey = new PublicKey(user.publicKey);
+
+        // Ensure player.secretKey, player.iv, and player.authTag are hex-encoded
+        const privateKey = decrypt(user.secretKey, user.iv, user.authTag);
+        
+        const playerKeypair = Keypair.fromSecretKey(privateKey);
+
+        const [playerAccount] = PublicKey.findProgramAddressSync(
+            [Buffer.from("player"), playerPublicKey.toBuffer(), seed.toArrayLike(Buffer, "le", 8)],
+            program.programId
+        );
+
+        const accounts = {
+            player: playerPublicKey,
+            payer: payer.publicKey,
+            escrow,
+            playerAccount,
+            systemProgram: SystemProgram.programId,
+        };
+
+        let tx = await program.methods
+            .finalize(seed, new anchor.BN(payout))
+            .accounts(accounts)
+            .signers([playerKeypair, payer])
+            .rpc();
+
+        console.log('Score saved successfully', tx);
         
         return NextResponse.json({ status: 200, message: "Payout saved successfully" });
   } catch (error) {

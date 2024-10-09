@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     try {
         const wallet = new NodeWallet(payer);
         const anchorWallet = wallet as anchor.Wallet;
-        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "recent" });
+        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "finalized" });
         anchor.setProvider(provider);
         
         // Load the program with IDL and program ID

@@ -4,6 +4,7 @@ import {
     PublicKey,
     Keypair,
     SystemProgram,
+    LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import fs from 'fs';
 import path from 'path';
@@ -30,9 +31,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(400).json({ message: "Payout and player number are required" });
         }
 
+        const amount = payout * LAMPORTS_PER_SOL;
+
         try {
             const wallet = new anchor.Wallet(payer);
-            const provider = new anchor.AnchorProvider(connection, wallet, { preflightCommitment: "recent" });
+            const provider = new anchor.AnchorProvider(connection, wallet, { preflightCommitment: "finalized" });
             anchor.setProvider(provider);
             
             // Load the program with IDL and program ID
@@ -66,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
 
             let tx = await program.methods
-                .finalize(seed, new anchor.BN(payout))
+                .finalize(seed, new anchor.BN(amount))
                 .accounts(accounts)
                 .signers([playerKeypair, payer])
                 .rpc();

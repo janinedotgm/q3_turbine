@@ -97,6 +97,11 @@ const finalizeGame = async (game: any) => {
     const playerGames = await getPlayerGamesForGame(game.id);
     const finalizeGameRes = await finalizeGameOnChain(playerGames, game.seed);
     console.log("🚀 ~ finalizeGame ~ finalizeGameRes:", finalizeGameRes)
+    for(const playerGame of playerGames){
+        const player = await findUserById(playerGame.userId);
+        const distributeRes = await distributeFunds(player);
+        console.log("🚀 ~ finalizeGame ~ distributeRes:", distributeRes)
+    }
 }
 
 const closeGame = async (game: any) => {

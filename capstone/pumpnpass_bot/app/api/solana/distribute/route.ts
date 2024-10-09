@@ -3,7 +3,7 @@ import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor"; 
 import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
-import { loadKeypair, readSeedFromFile } from '../../../../src/utils/chainhelpers';
+import { loadKeypair, readSeedFromFile, translateToJSON } from '../../../../src/utils/chainhelpers';
 import { decrypt } from '../../../../src/services/encryption';
 import { findUserByTelegramId } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
         if (!player) {
             return NextResponse.json({ status: 400, message: "Player is required" });
         }
+
+        
     
         const wallet = new NodeWallet(payer);
 

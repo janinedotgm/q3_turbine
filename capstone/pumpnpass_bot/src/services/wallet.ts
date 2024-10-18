@@ -7,7 +7,9 @@ import {
 } from "@solana/web3.js";
 import { encrypt } from "./encryption";
 
-const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+const url = process.env.RPC_URL || "https://api.devnet.solana.com";
+
+const connection = new Connection(url, "confirmed");
 
 export const getKeypair = () => new Keypair();
 

@@ -8,12 +8,10 @@ import {
 import * as anchor from "@coral-xyz/anchor"; 
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
 import { loadKeypair } from '../../../../src/utils/chainhelpers';
-import { findUserByTelegramId } from '../../../../src/db/queries/users';
 import { findActiveGameByUserId } from '@/src/db/queries/game';
 import { decrypt } from '../../../../src/services/encryption';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
-const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
 const connection = new Connection(process.env.RPC_URL ?? '');
 const payer = loadKeypair(`/payer-keypair.json`);
  

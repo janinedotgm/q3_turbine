@@ -8,12 +8,16 @@ import { depositGameBet } from "@/src/solana/deposit";
 export async function handleDeposit(chatId: string, telegramId: string, depositAmount: number) {
 
   const result = await depositGameBet(telegramId, depositAmount);
+  const publicKey = await findUserByTelegramId(telegramId);
+
 
   if(result.status === 200) {
 
+    const balance = await getBalance(publicKey.publicKey);
+
     await sendMessage(
       chatId,
-      `Deposit successful!`
+      `Deposit successful! New balance: ${balance} SOL`
     );
   } else {
     await sendMessage(

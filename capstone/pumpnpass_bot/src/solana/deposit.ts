@@ -18,6 +18,8 @@ export const depositGameBet = async (telegramId: string, amount: number) => {
         throw new Error(`Failed to initialize game on chain: ${response.statusText}`);
     }
 
+    
     const data = await response.json();
+    console.log("🚀 ~ depositGameBet ~ data:", data)
     return data;
 };

@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
         const deposits = depositPerPlayer * playerGames.length;
 
         let totalpoints = 0;
+        let ctrpoints = 0;
         for(const playerGame of playerGames){
             totalpoints += parseInt(playerGame.totalPoints);
         }
@@ -84,9 +85,13 @@ export async function POST(request: NextRequest) {
         for(const playerGame of playerGames){
             const share = calculateShare(parseInt(playerGame.totalPoints), totalpoints);
             const payout = share * deposits;
+            ctrpoints += payout;
+            if(ctrpoints > deposits){
+                console.log("🚀 ~ finalization failes because ctrpoints > deposits")
+            }
             await saveScoreOnChain(playerGame, payout, escrow.toString(), seedHex);
         }
-        
+
     return NextResponse.json({ status: 200, message: "Distribution successful" });
   } catch (error) {
     console.error("Error distributing funds:", error);

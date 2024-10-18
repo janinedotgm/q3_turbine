@@ -50,7 +50,7 @@ impl<'info> Deposit<'info> {
         let escrow = &mut self.escrow;
         let player_account = &mut self.player_account;
 
-        require!(escrow.status == GameStatus::Pending, ErrorCode::GameNotStarted);
+        // require!(escrow.status == GameStatus::Pending, ErrorCode::GameNotStarted);
 
         // Deposit game bet to escrow
         let cpi_accounts = Transfer {

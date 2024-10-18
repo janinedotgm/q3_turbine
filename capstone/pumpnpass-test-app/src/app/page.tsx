@@ -1,12 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+const baseUrl = 'http://localhost:3000';
+
 export default function Home() {
     const [result, setResult] = useState(null);
     const [gameInitialized, setGameInitialized] = useState(false);
 
     const handleLaunchGame = async () => {
-        const response = await fetch('/api/initialize', {
+        const response = await fetch(`/api/initialize, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

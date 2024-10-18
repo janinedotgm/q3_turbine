@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         };
 
         let tx = await program.methods
-            .finalize(seed, new anchor.BN(payout))
+            .finalize(seed, new anchor.BN(payout*LAMPORTS_PER_SOL))
             .accounts(accounts)
             .signers([playerKeypair, payer])
             .rpc();

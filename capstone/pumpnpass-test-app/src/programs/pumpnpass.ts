@@ -9,6 +9,9 @@ export type PumpNPass = {
   "instructions": [
     {
       "name": "deposit",
+      "docs": [
+        "* Deposit SOL into escrow\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param amount - Amount of SOL in lamports to deposit"
+      ],
       "discriminator": [
         242,
         35,
@@ -102,6 +105,9 @@ export type PumpNPass = {
     },
     {
       "name": "distributefunds",
+      "docs": [
+        "* Distribute funds from escrow to player. The amount of Lamports are saved in the player account."
+      ],
       "discriminator": [
         217,
         209,
@@ -187,6 +193,9 @@ export type PumpNPass = {
     },
     {
       "name": "finalize",
+      "docs": [
+        "* Save player payout\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param payout - Amount of SOL in lamports to payout"
+      ],
       "discriminator": [
         171,
         61,
@@ -280,6 +289,9 @@ export type PumpNPass = {
     },
     {
       "name": "initialize",
+      "docs": [
+        "* Initialize escrow\n     * \n     * @param duration - Duration of the game in seconds\n     * @param seed - Seed for the game (uuid from db)\n     * @param deposit_per_player - Amount of SOL in lamports to deposit per player"
+      ],
       "discriminator": [
         175,
         175,
@@ -345,6 +357,9 @@ export type PumpNPass = {
     },
     {
       "name": "savescore",
+      "docs": [
+        "* Save player score\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param score - Player score (the number of points they scored)"
+      ],
       "discriminator": [
         88,
         209,
@@ -601,6 +616,9 @@ export const IDL: PumpNPass = {
   "instructions": [
     {
       "name": "deposit",
+      "docs": [
+        "* Deposit SOL into escrow\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param amount - Amount of SOL in lamports to deposit"
+      ],
       "discriminator": [
         242,
         35,
@@ -694,6 +712,9 @@ export const IDL: PumpNPass = {
     },
     {
       "name": "distributefunds",
+      "docs": [
+        "* Distribute funds from escrow to player. The amount of Lamports are saved in the player account."
+      ],
       "discriminator": [
         217,
         209,
@@ -779,6 +800,9 @@ export const IDL: PumpNPass = {
     },
     {
       "name": "finalize",
+      "docs": [
+        "* Save player payout\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param payout - Amount of SOL in lamports to payout"
+      ],
       "discriminator": [
         171,
         61,
@@ -872,6 +896,9 @@ export const IDL: PumpNPass = {
     },
     {
       "name": "initialize",
+      "docs": [
+        "* Initialize escrow\n     * \n     * @param duration - Duration of the game in seconds\n     * @param seed - Seed for the game (uuid from db)\n     * @param deposit_per_player - Amount of SOL in lamports to deposit per player"
+      ],
       "discriminator": [
         175,
         175,
@@ -937,6 +964,9 @@ export const IDL: PumpNPass = {
     },
     {
       "name": "savescore",
+      "docs": [
+        "* Save player score\n     * \n     * @param seed - Seed for the game (uuid from db)\n     * @param score - Player score (the number of points they scored)"
+      ],
       "discriminator": [
         88,
         209,

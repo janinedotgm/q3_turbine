@@ -23,8 +23,6 @@ export function encrypt(data: Uint8Array): {
   const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
   const authTag = cipher.getAuthTag();
 
-  console.log("Encryption - Auth Tag Length:", authTag.length); // Should be 16
-
   return {
     encrypted: encrypted.toString('hex'),
     iv: iv.toString('hex'),
@@ -40,8 +38,6 @@ export function decrypt(
   const ivBuffer = Buffer.from(iv, 'hex');
   const authTagBuffer = Buffer.from(authTag, 'hex');
   const encryptedBuffer = Buffer.from(encryptedData, 'hex');
-
-  console.log("Decryption - Auth Tag Length:", authTagBuffer.length); // Should be 16
 
   if (authTagBuffer.length !== 16) {
     throw new Error("Invalid authentication tag length: " + authTagBuffer.length);

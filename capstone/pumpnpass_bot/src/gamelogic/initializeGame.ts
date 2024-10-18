@@ -84,7 +84,6 @@ export const endRound = async (currentRound: any) => {
 }
 
 const finishGame = async (game: any) => {
-    console.log("🚀 ~ finishing ~ game...")
     
     const playerGames = await getPlayerGamesForGame(game.id);
     playerGames.sort((a: any, b: any) => b.totalPoints - a.totalPoints);
@@ -92,22 +91,18 @@ const finishGame = async (game: any) => {
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
         const res = await saveScoreOnChain(player, playerGame.totalPoints);
-        console.log("saved score on chain");
+
         await notifyGameEnd(player, playerGames);
     }
 }
 
 const finalizeGame = async (game: any) => {
-    console.log("🚀 ~ finalizeGame ~ game...")
     const playerGames = await getPlayerGamesForGame(game.id);
     const finalizeGameRes = await finalizeGameOnChain(playerGames, game.seed);
 
-    console.log("🚀 ~ finalizeGame ~ finalizeGameRes:", finalizeGameRes)
     for(const playerGame of playerGames){
-        console.log("🚀 ~ going through player games")
         const player = await findUserById(playerGame.userId);
         const distributeRes = await distributeFunds(player);
-        console.log("🚀 ~ funds distributed...")
     }
 }
 
@@ -167,7 +162,6 @@ export const passToNextPlayer = async (round: any, playerRound: any, lastActiveP
 }
 
 export const startGame = async (gameId: string) => {
-    console.log("🚀 ~ startGame ~ gameId:", gameId)
 
     const res = await getCurrentRoundAndGame(gameId);
     const round = res[0].round;
@@ -178,8 +172,6 @@ export const startGame = async (gameId: string) => {
     }
 
     const players = game.players.filter((player: any) => player !== round?.activePlayerId);
-    console.log("🚀 ~ startGame ~ round?.activePlayerId:", round?.activePlayerId)
-    console.log("🚀 ~ startGame ~ players:", players);
     
     if(round && round.activePlayerId){
         const currentPlayer = await findUserById(round.activePlayerId);

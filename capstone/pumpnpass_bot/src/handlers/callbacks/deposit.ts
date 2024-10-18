@@ -8,7 +8,6 @@ import { depositGameBet } from "@/src/solana/deposit";
 export async function handleDeposit(chatId: string, telegramId: string, depositAmount: number) {
 
   const result = await depositGameBet(telegramId, depositAmount);
-  console.log("🚀 ~ handleDeposit ~ result:", result);
 
   if(result.status === 200) {
 

@@ -17,12 +17,7 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
-        console.log("save payout triggered...")
         const { escrow, payout, player, seedHex } = await request.json();
-        console.log("🚀 ~ POST ~ player:", player)
-        console.log("🚀 ~ POST ~ payout:", payout)
-        console.log("🚀 ~ POST ~ escrow:", escrow)
-        console.log("🚀 ~ POST ~ seed:", seedHex)
         const seed = new anchor.BN(seedHex, 'hex');
         const wallet = new NodeWallet(payer);
 
@@ -58,8 +53,6 @@ export async function POST(request: NextRequest) {
             .accounts(accounts)
             .signers([playerKeypair, payer])
             .rpc();
-
-        console.log('🚀🚀🚀🚀 Score saved successfully', tx);
         
         return NextResponse.json({ status: 200, message: "Payout saved successfully" });
   } catch (error) {

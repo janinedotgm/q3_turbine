@@ -7,6 +7,7 @@ import { initializeGame } from "@/src/gamelogic/initializeGame";
 import { findUserById } from "@/src/db/queries/users";
 import { notifyFirstPlayer } from "../commands/notifyFirstPlayer";
 import { createHash } from "crypto";
+import { MAX_PLAYERS, MIN_PLAYERS } from "@/src/utils/constants";
 
 const createMercuryoUrl = (publicKey: string) => {
   const address = publicKey;
@@ -77,7 +78,10 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
           "You have joined the game. It will start in a few seconds.",
         );
 
-        const newRound = await initializeGame(chatId, openGame);
+
+        if(openGame.players.length < MAX_PLAYERS && openGame.players.length >= MIN_PLAYERS){
+          const newRound = await initializeGame(chatId, openGame);
+        }
       }
     } else {
       const newGame = await createGame([existingUser.id]);

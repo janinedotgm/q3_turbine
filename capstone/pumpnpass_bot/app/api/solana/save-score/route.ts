@@ -21,8 +21,6 @@ const payer = loadKeypair(`/payer-keypair.json`);
 export async function POST(request: NextRequest) {
 
     const { score, player } = await request.json();
-    console.log("🚀 ~ handler ~ player:", player)
-    console.log("🚀 ~ handler ~ score:", score)
 
     if (!score || !player) {
         return NextResponse.json({ status: 400, message: "Score and player are required" });
@@ -84,7 +82,6 @@ export async function POST(request: NextRequest) {
             .signers([playerKeypair, payer])
             .rpc();
 
-        console.log('Score saved successfully', tx);
         return NextResponse.json({ status: 200, message: "Deposit successful" });
   } catch (error) {
     console.error("Error depositing funds:", error);

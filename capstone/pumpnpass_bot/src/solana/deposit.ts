@@ -19,6 +19,5 @@ export const depositGameBet = async (telegramId: string, amount: number) => {
     }
 
     const data = await response.json();
-    console.log("🚀 ~ initializeGameOnChain ~ data:", data);
     return data;
 };

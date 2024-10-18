@@ -1,8 +1,6 @@
 const baseUrl = process.env.BASE_URL;
 
 export const initializeGameOnChain = async (gameId: string, publicKeys: string[]) => {
-    console.log("🚀 ~ initializeGameOnChain ~ gameId:", gameId);
-    console.log("🚀 ~ initializeGameOnChain ~ publicKeys:", publicKeys);
     
     const response = await fetch(`${baseUrl}/api/solana/initialize`, {
         method: 'POST',
@@ -19,7 +17,6 @@ export const initializeGameOnChain = async (gameId: string, publicKeys: string[]
     }
 
     const data = await response.json();
-    console.log("🚀 ~ initializeGameOnChain ~ data:", data);
     return data;
 };
 
@@ -35,7 +32,6 @@ export const saveScoreOnChain = async (player: any, score: number) => {
 }   
 
 export const distributeFunds = async (player: any) => {
-    console.log("🚀 ~ distributeFunds for player:", player)
     const response = await fetch(`${baseUrl}/api/solana/distribute`, {
         method: 'POST',
         headers: {
@@ -47,7 +43,7 @@ export const distributeFunds = async (player: any) => {
 }
 
 export const finalizeGameOnChain = async (playerGames: any[], seedHex: string) => {
-    console.log("🚀 ~ finalizeGameOnChain ~ playerGames:")
+  
     const response = await fetch(`${baseUrl}/api/solana/finalize-game`, {
         method: 'POST',
         headers: {

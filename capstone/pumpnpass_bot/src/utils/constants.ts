@@ -4,7 +4,9 @@ export const PUMP_MAX_PRICE = 75;
 export const PUMP_MIN_AMOUNT = 0;
 export const PUMP_MAX_AMOUNT = 75;
 
-export const MAX_ROUNDS = 0; // 3 rounds starting with 0
+export const MIN_PLAYERS = 2;
+export const MAX_PLAYERS = 4;
+export const MAX_ROUNDS = 2; // 3 rounds starting with 0
 
 export const DEPOSIT_PER_PLAYER = 0.05; // 0.05 SOL
 
@@ -18,4 +20,3 @@ export const CALLBACK_DATA = {
     CANCEL_DEPOSIT: "CANCEL_DEPOSIT",
     PUMP: "PUMP",
   };
-  

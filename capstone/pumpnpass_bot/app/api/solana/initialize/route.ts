@@ -38,8 +38,6 @@ const payer = loadKeypair(`${homeDir}/payer-keypair.json`);
 // Save the seed to a file
 const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
     const seedHex = seed.toString('hex'); // Convert seed to hex
-    console.log("🚀 ~ saveSeedToFile ~ seedHex:", seedHex);
-    console.log("🚀 ~ saveSeedToFile ~ gameId:", gameId);
     updateGameSeed(gameId, seedHex); // Store as hex
 };
 
@@ -94,8 +92,6 @@ export async function POST(request: NextRequest) {
         //   webhookURL: `${baseUrl}/api/solana/webhook`,
         // });
 
-    
-    console.log("🚀 ~ handler ~ tx:", tx)
 
     saveSeedToFile(gameId, seed);
 

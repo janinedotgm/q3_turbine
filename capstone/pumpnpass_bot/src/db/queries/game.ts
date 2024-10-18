@@ -85,7 +85,6 @@ export const findActiveGameByUserId = async (uuid: string) => {
         .from(game)
         .where(and(eq(game.gamestatus, 'Active'), arrayContains(game.players, [uuid])));
 
-    console.log("🚀 ~ findActiveGameByUserId ~ results:", results)
     return results;
 }
 

@@ -1,5 +1,5 @@
 import { sendMessage } from "../../utils/telegramApi";
-import { createGameActionKeyboard, createMainMenuKeyboard } from "../../utils/keyboards";
+import { createMainMenuKeyboard } from "../../utils/keyboards";
 import { getBalance } from "@/src/services/wallet";
 
 export const notifyPayout = async (player: any) => {

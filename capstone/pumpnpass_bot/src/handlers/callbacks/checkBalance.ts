@@ -1,7 +1,6 @@
 // src/handlers/callbacks/checkBalance.ts
 
 import { sendMessage } from "../../utils/telegramApi";
-import { db } from "@/src/db";
 import { getBalance } from "@/src/services/wallet";
 import { createMainMenuKeyboard } from "@/src/utils/keyboards";
 import { findUserByTelegramId } from "@/src/db/queries/users";

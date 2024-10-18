@@ -1,8 +1,5 @@
 import { db } from "@/src/db";
-import { playerGame } from "@/src/db/schema";
-import { UUID } from "crypto";
 import { round } from "@/src/db/schema";
-import { playerRound } from "@/supabase/migrations/schema";
 import { randomInt } from "crypto";
 import { PUMP_MIN_AMOUNT, PUMP_MAX_AMOUNT } from "@/src/utils/constants";
 import { eq } from "drizzle-orm";

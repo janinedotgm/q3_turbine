@@ -1,11 +1,9 @@
 import { sendMessage } from "../../utils/telegramApi";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getBalance } from "@/src/services/wallet";
-import { createGameActionKeyboard, createTopUpKeyboard } from "@/src/utils/keyboards";
+import { createTopUpKeyboard } from "@/src/utils/keyboards";
 import { findOpenGame, joinGame, createGame } from "@/src/db/queries/game";
 import { initializeGame } from "@/src/gamelogic/initializeGame";
-import { findUserById } from "@/src/db/queries/users";
-import { notifyFirstPlayer } from "../commands/notifyFirstPlayer";
 import { createHash } from "crypto";
 import { MAX_PLAYERS, MIN_PLAYERS } from "@/src/utils/constants";
 
@@ -80,11 +78,11 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
 
 
         if(openGame.players.length < MAX_PLAYERS && openGame.players.length >= MIN_PLAYERS){
-          const newRound = await initializeGame(chatId, openGame);
+          await initializeGame(chatId, openGame);
         }
       }
     } else {
-      const newGame = await createGame([existingUser.id]);
+      await createGame([existingUser.id]);
 
       await sendMessage(
         chatId,

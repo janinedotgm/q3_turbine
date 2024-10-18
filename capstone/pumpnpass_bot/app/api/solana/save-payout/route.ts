@@ -3,22 +3,24 @@ import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor"; 
 import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
-import { loadKeypair, readSeedFromFile } from '../../../../src/utils/chainhelpers';
+import { loadKeypair } from '../../../../src/utils/chainhelpers';
 import { decrypt } from '../../../../src/services/encryption';
-import { findUserById, findUserByTelegramId } from '../../../../src/db/queries/users';
+import { findUserById } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
-import { findActiveGameByUserId } from '../../../../src/db/queries/game';
-import { startGame } from '../../../../src/gamelogic/initializeGame';
 
-const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
 const connection = new Connection(process.env.RPC_URL ?? '', 'confirmed');
-
-const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
         const { escrow, payout, player, seedHex } = await request.json();
         const seed = new anchor.BN(seedHex, 'hex');
+
+        const payer = loadKeypair();
+
+        if(!payer) {
+            return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+        }
+
         const wallet = new NodeWallet(payer);
 
         const anchorWallet = wallet as anchor.Wallet;
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
             systemProgram: SystemProgram.programId,
         };
 
-        let tx = await program.methods
+        await program.methods
             .finalize(seed, new anchor.BN(payout*LAMPORTS_PER_SOL))
             .accounts(accounts)
             .signers([playerKeypair, payer])

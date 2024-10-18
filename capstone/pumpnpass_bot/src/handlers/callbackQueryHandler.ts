@@ -40,7 +40,7 @@ export async function handleCallbackQuery(callbackQuery: any) {
         await handlePass(chatId, telegramId);
         break;
       case CALLBACK_DATA.CANCEL_DEPOSIT:
-        await handleCancelDeposit(chatId, telegramId);
+        await handleCancelDeposit(chatId);
         break;
       default:
         await sendMessage(chatId, "Unknown action.");

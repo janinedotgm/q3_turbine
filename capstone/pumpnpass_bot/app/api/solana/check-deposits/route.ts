@@ -8,20 +8,18 @@ import { findActiveGameByUserId } from '../../../../src/db/queries/game';
 
 const connection = new Connection(process.env.RPC_URL ?? '', 'confirmed');
 
-const payer = loadKeypair(`/payer-keypair.json`);
-
-const calculateShare = (playerScore: number, totalScore: number) => {
-    const payout = (playerScore / totalScore);
-    const formattedPayout = payout.toFixed(2); // Format to 2 decimal places
-    return parseFloat(formattedPayout); // Return as a number
-}
-
 export async function POST(request: NextRequest) {
     try {
         const { player } = await request.json();
         if (!player) {
             return NextResponse.json({ status: 400, message: "Player is required" });
         }
+        const payer = loadKeypair();
+
+        if(!payer) {
+            return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+        }
+
         const wallet = new NodeWallet(payer);
         const anchorWallet = wallet as anchor.Wallet;
         const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "confirmed" });

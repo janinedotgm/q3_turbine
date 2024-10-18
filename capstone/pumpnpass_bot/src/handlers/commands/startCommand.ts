@@ -24,7 +24,7 @@ export async function handleStartCommand(
     const keypair = await getKeypair();
     const secretData = encryptSecret(keypair.secretKey);
 
-    const result = await db.insert(users).values({
+     await db.insert(users).values({
       telegramId,
       publicKey: keypair.publicKey.toString(),
       username,

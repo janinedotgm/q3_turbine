@@ -13,7 +13,6 @@ import { decrypt } from '../../../../src/services/encryption';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
 const connection = new Connection(process.env.RPC_URL ?? '');
-const payer = loadKeypair(`/payer-keypair.json`);
  
 
 export async function POST(request: NextRequest) {
@@ -25,6 +24,12 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+
+        const payer = loadKeypair();
+
+        if(!payer) {
+            return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+        }
         const wallet = new NodeWallet(payer);
         const anchorWallet = wallet as anchor.Wallet;
         const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "finalized" });
@@ -74,7 +79,7 @@ export async function POST(request: NextRequest) {
             systemProgram: SystemProgram.programId,
         };
 
-        let tx = await program.methods
+        await program.methods
             .savescore(seed, new anchor.BN(score))
             .accounts(accounts)
             .signers([playerKeypair, payer])

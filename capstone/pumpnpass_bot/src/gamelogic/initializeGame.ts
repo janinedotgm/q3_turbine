@@ -1,5 +1,4 @@
-import { game } from "@/src/db/schema";
-import { createPlayerRoundEntries, updateAllPlayerRoundsAndRound } from "@/src/db/queries/playerRound";
+import { createPlayerRoundEntries } from "@/src/db/queries/playerRound";
 import { createPlayerGameEntries } from "@/src/db/queries/playerGame"; 
 import { createRoundEntry } from "@/src/db/queries/round";
 import { findGameById, updateGameStatus } from "@/src/db/queries/game";
@@ -95,7 +94,7 @@ const finishGame = async (game: any) => {
 
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
-        const res = await saveScoreOnChain(player, playerGame.totalPoints);
+        await saveScoreOnChain(player, playerGame.totalPoints);
 
         await notifyGameEnd(player, playerGames);
     }
@@ -103,13 +102,12 @@ const finishGame = async (game: any) => {
 
 const finalizeGame = async (game: any) => {
     const playerGames = await getPlayerGamesForGame(game.id);
-    const finalizeGameRes = await finalizeGameOnChain(playerGames, game.seed);
+    await finalizeGameOnChain(playerGames, game.seed);
 
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
         notifyFinalize(player);
         const distributeRes = await distributeFunds(player);
-        console.log("Distribute funds response:", distributeRes);
         if(distributeRes.status === 200){
             notifyPayout(player);
         }else{

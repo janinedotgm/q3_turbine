@@ -1,5 +1,5 @@
 import { db } from "@/src/db";
-import { playerGame, users } from "@/src/db/schema";
+import { playerGame } from "@/src/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export const createPlayerGameEntries = async (currentGame: any) => {

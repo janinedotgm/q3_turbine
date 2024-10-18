@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
+import { Keypair, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor"; 
 import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
-import { loadKeypair, readSeedFromFile, translateToJSON } from '../../../../src/utils/chainhelpers';
+import { loadKeypair } from '../../../../src/utils/chainhelpers';
 import { decrypt } from '../../../../src/services/encryption';
-import { findUserByTelegramId } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 import { findFinalizingGameByUserId } from '../../../../src/db/queries/game';
-import { startGame } from '../../../../src/gamelogic/initializeGame';
 
-const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
 const connection = new Connection(process.env.RPC_URL ?? '', 'confirmed');
 
-const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
@@ -23,7 +19,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ status: 400, message: "Player is required" });
         }
 
-        
+        const payer = loadKeypair();
+
+        if(!payer) {
+            return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+        }
     
         const wallet = new NodeWallet(payer);
 
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
             systemProgram: SystemProgram.programId,
         };
 
-        let tx = await program.methods
+        await program.methods
             .distributefunds() 
             .signers([playerKeypair])
             .accounts(accounts)

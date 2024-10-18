@@ -1,9 +1,9 @@
 import { randomInt } from "crypto";
-import { PUMP_MIN_PRICE, PUMP_MAX_PRICE } from "@/src/utils/constants";
+import { PUMP_MIN_PRICE } from "@/src/utils/constants";
 import { findUserByTelegramId } from "@/src/db/queries/users";
 import { getCurrentPlayerRoundAndRound, updateCurrentPlayerRoundAndRound } from "@/src/db/queries/playerRound";
 import { endRound } from "@/src/gamelogic/initializeGame";
-import { sendPumpSuccessMsg, sendPumpFailedMsg, sendPassedMsg } from "@/src/handlers/commands/gameMsg";
+import { sendPumpSuccessMsg, sendPumpFailedMsg } from "@/src/handlers/commands/gameMsg";
 
 /**
  * Triggered when player pumps
@@ -34,7 +34,7 @@ export const handlePump = async (chatId: string, telegramId: string) => {
         playerRound.roundPoints = 0;
         playerRound.pumps += 1;
 
-        const result = await updateCurrentPlayerRoundAndRound(round, playerRound, player.id);
+        await updateCurrentPlayerRoundAndRound(round, playerRound, player.id);
         await endRound(round);
     }else {
         const price = randomInt(PUMP_MIN_PRICE, round.maxPumps - round.currentPumps);

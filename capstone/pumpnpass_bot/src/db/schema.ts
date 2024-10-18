@@ -1,7 +1,6 @@
 import { integer, pgTable, numeric, text, timestamp } from 'drizzle-orm/pg-core';
 import { uuid } from 'drizzle-orm/pg-core';
 import { gameStatusEnum, roundStatusEnum } from './enums';
-import { double } from 'drizzle-orm/mysql-core';
 
 /**
  * Users

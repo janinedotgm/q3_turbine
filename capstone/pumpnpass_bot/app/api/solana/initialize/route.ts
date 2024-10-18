@@ -3,37 +3,17 @@ import { NextResponse } from "next/server";
 import {
     Connection,
     PublicKey,
-    Keypair,
     SystemProgram,
     LAMPORTS_PER_SOL
 } from '@solana/web3.js';
-import fs from 'fs';
-import path from 'path';
 import * as anchor from "@coral-xyz/anchor"; 
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
 import { randomBytes } from 'crypto';
 import { updateGameSeed } from '../../../../src/db/queries/game';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
-import { TransactionType, Helius } from 'helius-sdk';
-
-const helius = new Helius(process.env.HELIUS_API_KEY ?? '');
-const baseUrl = 'https://49f5-24-40-157-2.ngrok-free.app'; //process.env.BASE_URL;
-
-// export const runtime = "nodejs";
-
-const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
+import { loadKeypair } from "@/src/utils/chainhelpers";
 const connection = new Connection(process.env.RPC_URL ?? '');
 
-const loadKeypair = (filePath: string) => {
-    const resolvedPath = path.resolve(filePath);
-    const secretKeyString = fs.readFileSync(resolvedPath, 'utf8'); 
-    const secretKey = Uint8Array.from(JSON.parse(secretKeyString));
-    return Keypair.fromSecretKey(secretKey);
-};
-
-const homeDir = process.env.HOME_DIR;
-
-const payer = loadKeypair(`${homeDir}/payer-keypair.json`);
 
 // Save the seed to a file
 const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
@@ -44,6 +24,11 @@ const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
 export async function POST(request: NextRequest) {
   try {
     const {gameId, depositPerPlayer} = await request.json();
+    const payer = loadKeypair();
+
+    if(!payer) {
+        return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+    }
 
     const wallet = new NodeWallet(payer);
 
@@ -75,7 +60,7 @@ export async function POST(request: NextRequest) {
     const duration = new anchor.BN(3600);
     const amount = new anchor.BN(depositPerPlayer * LAMPORTS_PER_SOL);
 
-    let tx = await program.methods
+    await program.methods
         .initialize(
             seed,
             duration, 

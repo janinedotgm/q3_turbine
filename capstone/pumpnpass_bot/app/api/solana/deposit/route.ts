@@ -3,17 +3,14 @@ import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor"; 
 import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, PumpNPass } from '../../../../src/programs/pumpnpass'; 
-import { loadKeypair, readSeedFromFile } from '../../../../src/utils/chainhelpers';
+import { loadKeypair } from '../../../../src/utils/chainhelpers';
 import { decrypt } from '../../../../src/services/encryption';
 import { findUserByTelegramId } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 import { findActiveGameByUserId } from '../../../../src/db/queries/game';
 import { startGame } from '../../../../src/gamelogic/initializeGame';
 
-const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
 const connection = new Connection(process.env.RPC_URL ?? '', 'confirmed');
-
-const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
@@ -22,13 +19,17 @@ export async function POST(request: NextRequest) {
         if (!amount || !telegramId) {
             return NextResponse.json({ status: 400, message: "Amount and telegram ID are required" });
         }
+        
+        const payer = loadKeypair();
+
+        if(!payer) {
+            return NextResponse.json({ status: 400, message: "Failed to load keypair" });
+        }
     
         const wallet = new NodeWallet(payer);
-
         const anchorWallet = wallet as anchor.Wallet;
         const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "confirmed" });
         anchor.setProvider(provider);
-        
         const program = new anchor.Program<PumpNPass>(IDL, provider);
 
         const player = await findUserByTelegramId(telegramId);
@@ -36,11 +37,9 @@ export async function POST(request: NextRequest) {
 
         // Ensure player.secretKey, player.iv, and player.authTag are hex-encoded
         const privateKey = decrypt(player.secretKey, player.iv, player.authTag);
-        
         const playerKeypair = Keypair.fromSecretKey(privateKey);
 
         const game = await findActiveGameByUserId(player.id);
-
         if(game.length === 0 || game.length > 1) {
             return NextResponse.json({ status: 400, message: "Failed to find active game" });
         }
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
 
         const seedHex = game[0].seed;
         const seed = new anchor.BN(seedHex, 'hex'); // Convert from hex
-
         const [escrow] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from("escrow"), 
@@ -75,12 +73,11 @@ export async function POST(request: NextRequest) {
         };
 
         const lamports = amount*LAMPORTS_PER_SOL;
-        let tx = await program.methods
+        await program.methods
             .deposit(seed, new anchor.BN(lamports))
             .accounts(accounts)
             .signers([playerKeypair, payer])
             .rpc();
-
 
         const balance = await connection.getBalance(escrow) / LAMPORTS_PER_SOL;
 
@@ -88,9 +85,7 @@ export async function POST(request: NextRequest) {
         const expectedBalance = depositPerPlayer * game[0].players!.length;
 
         if(balance >= expectedBalance) {
-
             await startGame(game[0].id);
-            
         }
 
     return NextResponse.json({ status: 200, message: "Deposit successful" });

@@ -1,7 +1,5 @@
 
 import { sendMessage } from "../../utils/telegramApi";
-import { findGameById } from "../../db/queries/game";
-import { findUsersByIds } from "../../db/queries/users";
 
 export const notifyGameEnd = async (player: any, playerGames: any[]) => {
     const playerNumber = playerGames.length;

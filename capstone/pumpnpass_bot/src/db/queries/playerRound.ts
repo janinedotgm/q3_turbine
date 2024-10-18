@@ -1,7 +1,6 @@
 import { db } from "@/src/db";
 import { round } from "@/src/db/schema";
 import { playerRound } from "@/supabase/migrations/schema";
-import { UUID } from "crypto";
 import { eq, and} from "drizzle-orm";
 
 export const createPlayerRoundEntries = async (currentGame: any, currentRound: any, activePlayerId: string) => {
@@ -73,7 +72,7 @@ export const updateCurrentPlayerRoundAndRound = async (newRound: any, newPlayerR
 }
 
 export const updateAllPlayerRoundsAndRound = async (newRound: any, newPlayerRound: any) => {
-    const transaction = await db.transaction(async (trx) => {
+    await db.transaction(async (trx) => {
         // First, update the Round table based 
         const roundResult = await trx
             .update(round)

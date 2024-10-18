@@ -1,5 +1,4 @@
 import { sendMessage } from "../../utils/telegramApi";
-import { db } from "@/src/db";
 import { getBalance } from "@/src/services/wallet";
 import { createMainMenuKeyboard } from "@/src/utils/keyboards";
 import { findUserByTelegramId } from "@/src/db/queries/users";
@@ -27,7 +26,7 @@ export async function handleDeposit(chatId: string, telegramId: string, depositA
   }
 }
 
-export async function handleCancelDeposit(chatId: string, telegramId: string) {
+export async function handleCancelDeposit(chatId: string) {
   await sendMessage(
     chatId,
     "Deposit cancelled.",

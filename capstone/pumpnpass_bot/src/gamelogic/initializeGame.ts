@@ -1,8 +1,8 @@
 import { game } from "@/src/db/schema";
-import { createPlayerRoundEntries } from "@/src/db/queries/playerRound";
+import { createPlayerRoundEntries, updateAllPlayerRoundsAndRound } from "@/src/db/queries/playerRound";
 import { createPlayerGameEntries } from "@/src/db/queries/playerGame"; 
 import { createRoundEntry } from "@/src/db/queries/round";
-import { findGameById } from "@/src/db/queries/game";
+import { findGameById, updateGameStatus } from "@/src/db/queries/game";
 import { findUsersByIds, findUserById } from "@/src/db/queries/users";
 import { MAX_ROUNDS } from "@/src/utils/constants";
 import { updatePlayerGameTotalPoints } from "@/src/db/queries/playerGame";
@@ -18,6 +18,7 @@ import { notifyFirstPlayer } from "../handlers/commands/notifyFirstPlayer";
 import { getCurrentRoundAndGame } from "@/src/db/queries/game";
 import { notifyWaitingPlayers } from "../handlers/commands/notifyWaitingPlayers";
 import { saveScoreOnChain, distributeFunds, finalizeGameOnChain } from "@/src/solana/escrow";
+import { gameStatus } from "../utils/enums";
 
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
@@ -69,9 +70,12 @@ export const endRound = async (currentRound: any) => {
 
 
     if(currentRound.number >= MAX_ROUNDS){
+        await updateGameStatus(game.id, gameStatus.Finalizing);
+
         //finish game
         await finishGame(game);
         await finalizeGame(game);
+        await updateGameStatus(game.id, gameStatus.Finished);
     }else{
         // next round
         await nextRound(game, currentRound.number + 1, currentRound.activePlayerId);
@@ -80,6 +84,7 @@ export const endRound = async (currentRound: any) => {
 }
 
 const finishGame = async (game: any) => {
+    console.log("🚀 ~ finishing ~ game...")
     
     const playerGames = await getPlayerGamesForGame(game.id);
     playerGames.sort((a: any, b: any) => b.totalPoints - a.totalPoints);
@@ -87,25 +92,23 @@ const finishGame = async (game: any) => {
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
         const res = await saveScoreOnChain(player, playerGame.totalPoints);
-        // const distributeRes = await distributeFunds(player);
-        // console.log("🚀 ~ finishGame ~ distributeRes:", distributeRes)
+        console.log("saved score on chain");
         await notifyGameEnd(player, playerGames);
     }
 }
 
 const finalizeGame = async (game: any) => {
+    console.log("🚀 ~ finalizeGame ~ game...")
     const playerGames = await getPlayerGamesForGame(game.id);
     const finalizeGameRes = await finalizeGameOnChain(playerGames, game.seed);
+
     console.log("🚀 ~ finalizeGame ~ finalizeGameRes:", finalizeGameRes)
     for(const playerGame of playerGames){
+        console.log("🚀 ~ going through player games")
         const player = await findUserById(playerGame.userId);
         const distributeRes = await distributeFunds(player);
-        console.log("🚀 ~ finalizeGame ~ distributeRes:", distributeRes)
+        console.log("🚀 ~ funds distributed...")
     }
-}
-
-const closeGame = async (game: any) => {
-    console.log("Closing game and distributing funds =================================================");
 }
 
 const nextRound = async (game: any, nextRoundNumber: number, lastActivePlayerId: string) => {

@@ -1,7 +1,7 @@
 // src/handlers/callbackQueryHandler.ts
 
 import { sendMessage, answerCallbackQuery } from "../utils/telegramApi";
-import { CALLBACK_DATA } from "../constants";
+import { CALLBACK_DATA } from "../utils/constants";
 import { 
   handleCheckBalance, 
   handleGetWalletKey, 

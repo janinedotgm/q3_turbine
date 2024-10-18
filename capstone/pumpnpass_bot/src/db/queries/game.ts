@@ -2,6 +2,7 @@ import { db } from "@/src/db";
 import { game, round } from "@/src/db/schema";
 import { eq, and, arrayContains } from "drizzle-orm";
 import { DEPOSIT_PER_PLAYER } from "@/src/utils/constants";
+import { gameStatus } from "@/src/utils/enums";
 
 export const findOpenGame = async () => {
     try {
@@ -56,6 +57,16 @@ export const updateGameSeed = async (gameId: string, seed: string) => {
     }
 }
 
+export const updateGameStatus = async (gameId: string, gameStatus: gameStatus) => {
+    try {
+        const updatedGame = await db.update(game).set({ gamestatus: gameStatus }).where(eq(game.id, gameId));
+        return updatedGame;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
 
 export const getCurrentRoundAndGame = async (gameId: string) => {
 
@@ -74,9 +85,18 @@ export const findActiveGameByUserId = async (uuid: string) => {
         .from(game)
         .where(and(eq(game.gamestatus, 'Active'), arrayContains(game.players, [uuid])));
 
+    console.log("🚀 ~ findActiveGameByUserId ~ results:", results)
     return results;
 }
 
+export const findFinalizingGameByUserId = async (uuid: string) => {
+    const results = await db
+        .select()
+        .from(game)
+        .where(and(eq(game.gamestatus, 'Finalizing'), arrayContains(game.players, [uuid])));
+
+    return results;
+}
 // export const getCurrentPlayerRoundAndRound = async (playerId: string) => {
 
 //     const results = await db

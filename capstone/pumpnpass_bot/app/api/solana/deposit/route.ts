@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         const wallet = new NodeWallet(payer);
 
         const anchorWallet = wallet as anchor.Wallet;
-        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "recent" });
+        const provider = new anchor.AnchorProvider(connection, anchorWallet, { preflightCommitment: "confirmed" });
         anchor.setProvider(provider);
         
         const program = new anchor.Program<PumpNPass>(IDL, provider);

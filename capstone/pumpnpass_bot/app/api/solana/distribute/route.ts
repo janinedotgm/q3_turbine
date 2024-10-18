@@ -7,7 +7,7 @@ import { loadKeypair, readSeedFromFile, translateToJSON } from '../../../../src/
 import { decrypt } from '../../../../src/services/encryption';
 import { findUserByTelegramId } from '../../../../src/db/queries/users';
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
-import { findActiveGameByUserId } from '../../../../src/db/queries/game';
+import { findFinalizingGameByUserId } from '../../../../src/db/queries/game';
 import { startGame } from '../../../../src/gamelogic/initializeGame';
 
 const PROGRAM_ID = new PublicKey('67zrcgrGfk4NGR6YTQNoqZhSxbhq87ZTPZFZvdQyJ3vz');
@@ -17,6 +17,7 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
+        console.log("🚀 ~ distribution triggered...")
         const { player } = await request.json();
 
         if (!player) {
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
         
         const playerKeypair = Keypair.fromSecretKey(privateKey);
 
-        const game = await findActiveGameByUserId(player.id);
+        const game = await findFinalizingGameByUserId(player.id);
 
         if(game.length === 0 || game.length > 1) {
             return NextResponse.json({ status: 400, message: "Failed to find active game" });
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
             .accounts(accounts)
             .rpc();
 
-        console.log('Withdrawal successful', tx);
+        console.log('🚀🚀🚀🚀 Withdrawal successful', tx);
 
 
     return NextResponse.json({ status: 200, message: "Distribution successful" });

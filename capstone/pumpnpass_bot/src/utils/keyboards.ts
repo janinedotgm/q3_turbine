@@ -1,6 +1,6 @@
 // src/utils/keyboards.ts
 
-import { CALLBACK_DATA } from "../constants";
+import { CALLBACK_DATA } from "./constants";
 
 // Main Menu Inline Keyboard
 export const createMainMenuKeyboard = () => ({

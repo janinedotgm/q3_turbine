@@ -17,6 +17,7 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
+        console.log("save payout triggered...")
         const { escrow, payout, player, seedHex } = await request.json();
         console.log("🚀 ~ POST ~ player:", player)
         console.log("🚀 ~ POST ~ payout:", payout)
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
             .signers([playerKeypair, payer])
             .rpc();
 
-        console.log('Score saved successfully', tx);
+        console.log('🚀🚀🚀🚀 Score saved successfully', tx);
         
         return NextResponse.json({ status: 200, message: "Payout saved successfully" });
   } catch (error) {

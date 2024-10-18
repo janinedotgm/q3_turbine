@@ -35,6 +35,7 @@ export const saveScoreOnChain = async (player: any, score: number) => {
 }   
 
 export const distributeFunds = async (player: any) => {
+    console.log("🚀 ~ distributeFunds for player:", player)
     const response = await fetch(`${baseUrl}/api/solana/distribute`, {
         method: 'POST',
         headers: {
@@ -46,6 +47,7 @@ export const distributeFunds = async (player: any) => {
 }
 
 export const finalizeGameOnChain = async (playerGames: any[], seedHex: string) => {
+    console.log("🚀 ~ finalizeGameOnChain ~ playerGames:")
     const response = await fetch(`${baseUrl}/api/solana/finalize-game`, {
         method: 'POST',
         headers: {
@@ -53,4 +55,6 @@ export const finalizeGameOnChain = async (playerGames: any[], seedHex: string) =
         },
         body: JSON.stringify({ playerGames, seedHex }),   
     });
+
+    return response;
 }

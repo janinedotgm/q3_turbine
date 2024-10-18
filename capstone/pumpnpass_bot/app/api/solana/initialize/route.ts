@@ -17,9 +17,9 @@ const connection = new Connection(process.env.RPC_URL ?? '');
 export const maxDuration = 60;
 
 // Save the seed to a file
-const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
+const saveSeedToFile = async (gameId: string, seed: anchor.BN) => {
     const seedHex = seed.toString('hex'); // Convert seed to hex
-    updateGameSeed(gameId, seedHex); // Store as hex
+    await updateGameSeed(gameId, seedHex); // Store as hex
 };
 
 export async function POST(request: NextRequest) {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         // });
 
 
-    saveSeedToFile(gameId, seed);
+    await saveSeedToFile(gameId, seed);
 
     return NextResponse.json({ status: 200, message: "Escrow initialized" });
   } catch (error) {

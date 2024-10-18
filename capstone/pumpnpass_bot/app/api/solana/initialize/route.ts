@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const duration = new anchor.BN(3600);
     const amount = new anchor.BN(depositPerPlayer * LAMPORTS_PER_SOL);
 
-    await program.methods
+    const tx = await program.methods
         .initialize(
             seed,
             duration, 
@@ -69,6 +69,8 @@ export async function POST(request: NextRequest) {
         .accounts(accounts)
         .signers([payer])
         .rpc();
+
+    console.log("Transaction signature:", tx);
 
         // TODO: Webhook was to slow, find another solution
         // helius.createWebhook({

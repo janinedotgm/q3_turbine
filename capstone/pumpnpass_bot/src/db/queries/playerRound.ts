@@ -1,6 +1,5 @@
 import { db } from "@/src/db";
-import { round } from "@/src/db/schema";
-import { playerRound } from "@/supabase/migrations/schema";
+import { round, playerRound } from "@/src/db/schema";
 import { eq, and} from "drizzle-orm";
 
 export const createPlayerRoundEntries = async (currentGame: any, currentRound: any, activePlayerId: string) => {

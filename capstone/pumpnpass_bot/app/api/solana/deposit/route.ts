@@ -18,8 +18,6 @@ const payer = loadKeypair(`/payer-keypair.json`);
 export async function POST(request: NextRequest) {
     try {
         const { amount, telegramId } = await request.json();
-        console.log("🚀 ~ POST ~ telegramId:", telegramId);
-        console.log("🚀 ~ POST ~ amount:", amount);
 
         if (!amount || !telegramId) {
             return NextResponse.json({ status: 400, message: "Amount and telegram ID are required" });
@@ -63,8 +61,6 @@ export async function POST(request: NextRequest) {
             program.programId
         );
 
-        console.log("🚀 ~ POST ~ escrow:", escrow)
-
         const [playerAccount] = PublicKey.findProgramAddressSync(
             [Buffer.from("player"), playerPublicKey.toBuffer(), seed.toArrayLike(Buffer, "le", 8)],
             program.programId
@@ -85,17 +81,14 @@ export async function POST(request: NextRequest) {
             .signers([playerKeypair, payer])
             .rpc();
 
-        console.log('Deposit successful', tx);
 
         const balance = await connection.getBalance(escrow) / LAMPORTS_PER_SOL;
-        console.log("🚀 ~ POST ~ balance:", balance)
 
         const depositPerPlayer = parseFloat(game[0].deposit_per_player);
         const expectedBalance = depositPerPlayer * game[0].players!.length;
-        console.log("🚀 ~ POST ~ expectedBalance:", expectedBalance)
 
         if(balance >= expectedBalance) {
-            console.log("Starting game -> notify players");
+
             await startGame(game[0].id);
             
         }

@@ -6,7 +6,7 @@ export const PUMP_MAX_AMOUNT = 75;
 
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 4;
-export const MAX_ROUNDS = 0; // 3 rounds starting with 0
+export const MAX_ROUNDS = 2; // 3 rounds starting with 0
 
 export const DEPOSIT_PER_PLAYER = 0.05; // 0.05 SOL
 

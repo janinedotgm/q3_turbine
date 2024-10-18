@@ -29,6 +29,8 @@ export const saveScoreOnChain = async (player: any, score: number) => {
         body: JSON.stringify({ player, score }),   
     });
 
+    return response;
+
 }   
 
 export const distributeFunds = async (player: any) => {
@@ -39,6 +41,8 @@ export const distributeFunds = async (player: any) => {
         },
         body: JSON.stringify({ player }),   
     });
+
+    return response;
 
 }
 

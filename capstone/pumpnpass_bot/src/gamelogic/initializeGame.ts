@@ -19,6 +19,9 @@ import { getCurrentRoundAndGame } from "@/src/db/queries/game";
 import { notifyWaitingPlayers } from "../handlers/commands/notifyWaitingPlayers";
 import { saveScoreOnChain, distributeFunds, finalizeGameOnChain } from "@/src/solana/escrow";
 import { gameStatus } from "../utils/enums";
+import { notifyRoundEnd } from "../handlers/commands/notifyRoundEnd";
+import { notifyFinalize } from "../handlers/commands/notifyFinalize";
+import { notifyPayout } from "../handlers/commands/notifyPayout";
 
 export const initializeGame = async (chatId: string, currentGame: any) => {
 
@@ -66,6 +69,7 @@ export const endRound = async (currentRound: any) => {
 
     for(const playerRound of playerRounds){
         await updatePlayerGameTotalPoints(playerRound.gameId, playerRound.userId, playerRound.roundPoints);
+        await notifyRoundEnd(playerRound.userId, playerRound.roundPoints,  currentRound.number + 1);
     }
 
 
@@ -77,6 +81,7 @@ export const endRound = async (currentRound: any) => {
         await finalizeGame(game);
         await updateGameStatus(game.id, gameStatus.Finished);
     }else{
+          
         // next round
         await nextRound(game, currentRound.number + 1, currentRound.activePlayerId);
     }
@@ -102,7 +107,14 @@ const finalizeGame = async (game: any) => {
 
     for(const playerGame of playerGames){
         const player = await findUserById(playerGame.userId);
+        notifyFinalize(player);
         const distributeRes = await distributeFunds(player);
+        console.log("Distribute funds response:", distributeRes);
+        if(distributeRes.status === 200){
+            notifyPayout(player);
+        }else{
+            console.log("Error distributing funds");
+        }
     }
 }
 

@@ -1,5 +1,3 @@
-import { findUserByTelegramId } from "@/src/db/queries/users";
-
 const baseUrl = process.env.BASE_URL;
 
 export const depositGameBet = async (telegramId: string, amount: number) => {

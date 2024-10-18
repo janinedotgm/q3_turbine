@@ -17,7 +17,6 @@ const payer = loadKeypair(`/payer-keypair.json`);
 
 export async function POST(request: NextRequest) {
     try {
-        console.log("🚀 ~ distribution triggered...")
         const { player } = await request.json();
 
         if (!player) {
@@ -63,8 +62,6 @@ export async function POST(request: NextRequest) {
             program.programId
         );
 
-        console.log("🚀 ~ POST ~ escrow:", escrow)
-
         const [playerAccount] = PublicKey.findProgramAddressSync(
             [Buffer.from("player"), 
                 playerPublicKey.toBuffer(), 
@@ -85,9 +82,6 @@ export async function POST(request: NextRequest) {
             .signers([playerKeypair])
             .accounts(accounts)
             .rpc();
-
-        console.log('🚀🚀🚀🚀 Withdrawal successful', tx);
-
 
     return NextResponse.json({ status: 200, message: "Distribution successful" });
   } catch (error) {

@@ -75,7 +75,7 @@ export async function handleStartNewGame(chatId: string, telegramId: string) {
 
         await sendMessage(
           chatId,
-          "You have joined the game. It will start in a few seconds.",
+          "You have joined the game. It will soon.",
         );
 
 

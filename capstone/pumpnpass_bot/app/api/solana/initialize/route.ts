@@ -14,6 +14,7 @@ import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 import { loadKeypair } from "@/src/utils/chainhelpers";
 const connection = new Connection(process.env.RPC_URL ?? '');
 
+export const maxDuration = 60;
 
 // Save the seed to a file
 const saveSeedToFile = (gameId: string, seed: anchor.BN) => {
